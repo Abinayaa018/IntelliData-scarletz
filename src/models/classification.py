@@ -75,7 +75,7 @@ class StockoutClassifierSuite:
             "Random Forest (Unbalanced)": (RandomForestClassifier(n_estimators=100, max_depth=10, random_state=self.random_seed, n_jobs=-1), False),
             "XGBoost Classifier": (xgb.XGBClassifier(n_estimators=100, max_depth=6, learning_rate=0.08, scale_pos_weight=scale_pos_wt, random_state=self.random_seed, n_jobs=-1), False),
             "Decision Tree": (DecisionTreeClassifier(max_depth=8, class_weight="balanced", random_state=self.random_seed), False),
-            "SVM Classifier": (SVC(probability=True, class_weight="balanced", random_state=self.random_seed), True),
+            "SVM Classifier": (SVC(class_weight="balanced", random_state=self.random_seed), True),
             "KNN Classifier": (KNeighborsClassifier(n_neighbors=7, n_jobs=-1), True),
             "Naive Bayes": (GaussianNB(), True),
             "Logistic Regression": (LogisticRegression(class_weight="balanced", max_iter=1000, random_state=self.random_seed), True)
@@ -91,12 +91,9 @@ class StockoutClassifierSuite:
                 ("classifier", classifier)
             ])
             
-            # Fit on training set
-            pipe.fit(train_df, y_train)
-            
-            # Calibrate probabilities using Platt scaling (sigmoid) on validation set
-            calibrated_pipe = CalibratedClassifierCV(estimator=pipe, method="sigmoid", cv="prefit")
-            calibrated_pipe.fit(val_df, y_val)
+            # Fit & calibrate probabilities using Platt scaling (sigmoid) via cross-validation
+            calibrated_pipe = CalibratedClassifierCV(estimator=pipe, method="sigmoid", cv=5)
+            calibrated_pipe.fit(train_df, y_train)
             
             # Predict probabilities on test set
             probs = calibrated_pipe.predict_proba(test_df)[:, 1]

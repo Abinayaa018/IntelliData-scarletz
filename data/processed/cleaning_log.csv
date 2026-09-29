@@ -1,0 +1,7 @@
+dataset,operation,column,rows_before,rows_after,rows_affected,description
+products,normalize_category_capitalization,category,30,30,2,"Normalized 2 category string variants (e.g., 'beverages', 'BEVERAGES') to Title Case 'Beverages'"
+external_factors,impute_missing_values,temp_c,972,972,18,Imputed 18 missing temperature values using city-level time-series forward/backward fill
+inventory,correct_inventory_balance,closing,29160,29160,25,Reconciled 25 inventory records where closing stock diverged from (opening + received - sold)
+transactions,remove_duplicates,all,67344,67343,1,Removed 1 exact duplicate transaction records
+transactions,remove_invalid_records,quantity,67343,67342,1,Removed 1 invalid transaction records with negative or zero quantity
+transactions,retain_valid_outliers,quantity,67342,67342,0,Retained valid high-volume promotional bulk transaction records after business rule validation

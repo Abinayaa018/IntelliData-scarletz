@@ -1,16 +1,121 @@
 Store,Product,Current Stock,7-Day Forecast,Stock-out Probability,Risk,Recommended Order,Key Reasons,Manager Action,Estimated Lost Sales
-S01,Fresh Organic Milk 1L,136,240,0.998,HIGH,123,"High stockout probability, Unfulfilled demand (104 units)",Raise replenishment order IMMEDIATELY (+123 units),6233.99
-S01,Artisanal White Bread 400g,108,180,0.995,HIGH,86,"High stockout probability, Unfulfilled demand (72 units)",Raise replenishment order IMMEDIATELY (+86 units),3233.44
-S01,Sparkling Soda 500ml,6,303,0.999,HIGH,326,"High stockout probability, Unfulfilled demand (297 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+326 units),9368.23
-S01,Basmati Premium Rice 5kg,51,71,0.993,HIGH,39,"High stockout probability, Unfulfilled demand (20 units)",Raise replenishment order IMMEDIATELY (+39 units),8301.97
-S01,Herbal Shampoo 250ml,11,72,0.998,HIGH,72,"High stockout probability, Unfulfilled demand (61 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+72 units),10777.28
-S02,Fresh Organic Milk 1L,367,438,0.045,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
-S02,Artisanal White Bread 400g,0,302,0.999,HIGH,317,"High stockout probability, Unfulfilled demand (302 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+317 units),12236.84
-S02,Sparkling Soda 500ml,377,597,0.996,HIGH,249,"High stockout probability, Unfulfilled demand (220 units)",Raise replenishment order IMMEDIATELY (+249 units),7699.75
-S02,Basmati Premium Rice 5kg,0,139,0.998,HIGH,157,"High stockout probability, Unfulfilled demand (139 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+157 units),62330.62
-S02,Herbal Shampoo 250ml,83,84,0.932,HIGH,11,"High stockout probability, Unfulfilled demand (1 units)",Raise replenishment order IMMEDIATELY (+11 units),241.95
-S03,Fresh Organic Milk 1L,0,587,0.998,HIGH,606,"High stockout probability, Unfulfilled demand (587 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+606 units),35236.73
-S03,Artisanal White Bread 400g,0,508,0.999,HIGH,522,"High stockout probability, Unfulfilled demand (508 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+522 units),22846.34
-S03,Sparkling Soda 500ml,0,825,0.999,HIGH,854,"High stockout probability, Unfulfilled demand (825 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+854 units),28890.47
-S03,Basmati Premium Rice 5kg,0,156,0.999,HIGH,175,"High stockout probability, Unfulfilled demand (156 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+175 units),70064.43
-S03,Herbal Shampoo 250ml,180,184,0.023,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P101,98,159,0.961,HIGH,75,"High stockout probability, Unfulfilled demand (61 units)",Raise replenishment order IMMEDIATELY (+75 units),3673.14
+S01,Product P102,240,472,0.971,HIGH,251,"High stockout probability, Unfulfilled demand (232 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+251 units),10489.52
+S01,Product P103,406,409,0.471,MEDIUM,22,Unfulfilled demand (3 units),Order within 2 days (+22 units),352.39
+S01,Product P104,342,296,0.1,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P105,216,313,0.943,HIGH,111,"High stockout probability, Unfulfilled demand (97 units)",Raise replenishment order IMMEDIATELY (+111 units),9312.45
+S01,Product P201,191,190,0.174,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P202,44,60,0.808,HIGH,27,"High stockout probability, Unfulfilled demand (16 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+27 units),741.19
+S01,Product P203,97,165,0.965,HIGH,78,"High stockout probability, Unfulfilled demand (68 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+78 units),6526.63
+S01,Product P204,59,78,0.799,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P205,65,67,0.136,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P301,186,285,0.941,HIGH,116,"High stockout probability, Unfulfilled demand (99 units)",Raise replenishment order IMMEDIATELY (+116 units),4900.79
+S01,Product P302,174,444,0.971,HIGH,287,"High stockout probability, Unfulfilled demand (270 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+287 units),24430.22
+S01,Product P303,133,353,0.971,HIGH,237,"High stockout probability, Unfulfilled demand (220 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+237 units),5494.46
+S01,Product P304,314,380,0.626,MEDIUM,95,Unfulfilled demand (66 units),Order within 2 days (+95 units),7955.09
+S01,Product P305,372,362,0.141,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P401,255,422,0.962,HIGH,187,"High stockout probability, Unfulfilled demand (167 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+187 units),5869.59
+S01,Product P402,167,315,0.97,HIGH,165,"High stockout probability, Unfulfilled demand (148 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+165 units),4467.61
+S01,Product P403,149,166,0.787,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P404,307,440,0.919,HIGH,154,"High stockout probability, Unfulfilled demand (133 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+154 units),10013.38
+S01,Product P405,272,284,0.223,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P501,101,117,0.905,HIGH,28,"High stockout probability, Unfulfilled demand (16 units)",Raise replenishment order IMMEDIATELY (+28 units),3612.63
+S01,Product P502,57,97,0.963,HIGH,60,"High stockout probability, Unfulfilled demand (40 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+60 units),3753.74
+S01,Product P503,43,68,0.955,HIGH,37,"High stockout probability, Unfulfilled demand (25 units)",Raise replenishment order IMMEDIATELY (+37 units),3549.71
+S01,Product P504,116,189,0.966,HIGH,85,"High stockout probability, Unfulfilled demand (73 units)",Raise replenishment order IMMEDIATELY (+85 units),5855.32
+S01,Product P505,115,167,0.87,HIGH,6,"High stockout probability, Stock below reorder level",Raise replenishment order IMMEDIATELY (+6 units),0.0
+S01,Product P601,97,170,0.968,HIGH,85,"High stockout probability, Unfulfilled demand (73 units)",Raise replenishment order IMMEDIATELY (+85 units),10233.31
+S01,Product P602,117,135,0.199,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S01,Product P603,198,202,0.726,HIGH,16,"High stockout probability, Unfulfilled demand (4 units)",Raise replenishment order IMMEDIATELY (+16 units),391.99
+S01,Product P604,145,160,0.685,MEDIUM,32,Unfulfilled demand (15 units),Order within 2 days (+32 units),2414.31
+S01,Product P605,93,132,0.797,HIGH,63,"High stockout probability, Unfulfilled demand (39 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+63 units),8244.52
+S02,Product P101,206,257,0.709,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P102,634,765,0.393,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P103,595,650,0.276,LOW,79,Unfulfilled demand (55 units),Monitor stock levels — adequate inventory cover,6105.79
+S02,Product P104,422,515,0.583,MEDIUM,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P105,231,516,0.971,HIGH,298,"High stockout probability, Unfulfilled demand (285 units)",Raise replenishment order IMMEDIATELY (+298 units),27127.9
+S02,Product P201,277,318,0.611,MEDIUM,49,Unfulfilled demand (41 units),Order within 2 days (+49 units),4954.01
+S02,Product P202,69,94,0.865,HIGH,34,"High stockout probability, Unfulfilled demand (25 units)",Raise replenishment order IMMEDIATELY (+34 units),1114.98
+S02,Product P203,218,273,0.605,MEDIUM,64,Unfulfilled demand (55 units),Order within 2 days (+64 units),5264.59
+S02,Product P204,117,136,0.426,MEDIUM,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P205,101,103,0.19,LOW,12,Unfulfilled demand (2 units),Monitor stock levels — adequate inventory cover,172.27
+S02,Product P301,402,518,0.477,MEDIUM,149,Unfulfilled demand (116 units),Order within 2 days (+149 units),5712.48
+S02,Product P302,676,779,0.137,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P303,413,621,0.877,HIGH,232,"High stockout probability, Unfulfilled demand (208 units)",Raise replenishment order IMMEDIATELY (+232 units),5157.89
+S02,Product P304,404,646,0.942,HIGH,271,"High stockout probability, Unfulfilled demand (242 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+271 units),28994.45
+S02,Product P305,520,632,0.307,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P401,481,731,0.901,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P402,459,520,0.343,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P403,288,260,0.103,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P404,521,698,0.768,HIGH,194,"High stockout probability, Unfulfilled demand (177 units)",Raise replenishment order IMMEDIATELY (+194 units),13259.4
+S02,Product P405,297,500,0.952,HIGH,215,"High stockout probability, Unfulfilled demand (203 units)",Raise replenishment order IMMEDIATELY (+215 units),11369.02
+S02,Product P501,129,198,0.95,HIGH,89,"High stockout probability, Unfulfilled demand (69 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+89 units),15115.62
+S02,Product P502,110,164,0.947,HIGH,75,"High stockout probability, Unfulfilled demand (54 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+75 units),5155.02
+S02,Product P503,140,111,0.095,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P504,250,300,0.932,HIGH,62,"High stockout probability, Unfulfilled demand (50 units)",Raise replenishment order IMMEDIATELY (+62 units),3986.69
+S02,Product P505,361,272,0.093,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P601,174,271,0.914,HIGH,113,"High stockout probability, Unfulfilled demand (97 units)",Raise replenishment order IMMEDIATELY (+113 units),13562.71
+S02,Product P602,108,201,0.969,HIGH,110,"High stockout probability, Unfulfilled demand (93 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+110 units),16666.15
+S02,Product P603,365,322,0.094,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Product P604,110,259,0.971,HIGH,161,"High stockout probability, Unfulfilled demand (149 units)",Raise replenishment order IMMEDIATELY (+161 units),23671.08
+S02,Product P605,226,233,0.301,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P101,102,94,0.1,LOW,0,Stable demand velocity,Reduce order: severe perishable expiry risk,0.0
+S03,Product P102,195,289,0.941,HIGH,117,"High stockout probability, Unfulfilled demand (94 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+117 units),4215.21
+S03,Product P103,142,256,0.968,HIGH,134,"High stockout probability, Unfulfilled demand (114 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+134 units),12506.5
+S03,Product P104,126,193,0.951,HIGH,81,"High stockout probability, Unfulfilled demand (67 units)",Raise replenishment order IMMEDIATELY (+81 units),10026.41
+S03,Product P105,123,189,0.959,HIGH,90,"High stockout probability, Unfulfilled demand (66 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+90 units),5134.87
+S03,Product P201,74,115,0.964,HIGH,49,"High stockout probability, Unfulfilled demand (41 units)",Raise replenishment order IMMEDIATELY (+49 units),4915.11
+S03,Product P202,21,39,0.963,HIGH,24,"High stockout probability, Unfulfilled demand (18 units)",Raise replenishment order IMMEDIATELY (+24 units),833.54
+S03,Product P203,69,100,0.916,HIGH,36,"High stockout probability, Unfulfilled demand (31 units)",Raise replenishment order IMMEDIATELY (+36 units),2965.15
+S03,Product P204,46,51,0.399,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P205,31,40,0.859,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P301,100,173,0.967,HIGH,90,"High stockout probability, Unfulfilled demand (73 units)",Raise replenishment order IMMEDIATELY (+90 units),3634.13
+S03,Product P302,161,282,0.963,HIGH,138,"High stockout probability, Unfulfilled demand (121 units)",Raise replenishment order IMMEDIATELY (+138 units),10723.13
+S03,Product P303,177,228,0.804,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P304,118,230,0.969,HIGH,136,"High stockout probability, Unfulfilled demand (112 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+136 units),13532.4
+S03,Product P305,223,213,0.109,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P401,243,263,0.704,HIGH,37,"High stockout probability, Unfulfilled demand (20 units)",Raise replenishment order IMMEDIATELY (+37 units),720.53
+S03,Product P402,136,197,0.954,HIGH,73,"High stockout probability, Unfulfilled demand (61 units)",Raise replenishment order IMMEDIATELY (+73 units),1823.77
+S03,Product P403,81,101,0.77,HIGH,44,"High stockout probability, Unfulfilled demand (20 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+44 units),1297.21
+S03,Product P404,333,286,0.094,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P405,120,179,0.949,HIGH,71,"High stockout probability, Unfulfilled demand (59 units)",Raise replenishment order IMMEDIATELY (+71 units),3248.91
+S03,Product P501,67,79,0.821,HIGH,29,"High stockout probability, Unfulfilled demand (12 units)",Raise replenishment order IMMEDIATELY (+29 units),2693.29
+S03,Product P502,48,61,0.726,HIGH,11,High stockout probability,Raise replenishment order IMMEDIATELY (+11 units),0.0
+S03,Product P503,31,43,0.335,LOW,19,Stock below reorder level,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P504,145,112,0.093,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P505,99,99,0.362,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S03,Product P601,96,102,0.76,HIGH,23,"High stockout probability, Unfulfilled demand (6 units)",Raise replenishment order IMMEDIATELY (+23 units),860.12
+S03,Product P602,57,79,0.924,HIGH,34,"High stockout probability, Unfulfilled demand (22 units)",Raise replenishment order IMMEDIATELY (+34 units),3967.28
+S03,Product P603,95,127,0.734,HIGH,49,"High stockout probability, Unfulfilled demand (32 units)",Raise replenishment order IMMEDIATELY (+49 units),2928.69
+S03,Product P604,56,96,0.963,HIGH,57,"High stockout probability, Unfulfilled demand (40 units)",Raise replenishment order IMMEDIATELY (+57 units),6391.08
+S03,Product P605,56,84,0.947,HIGH,40,"High stockout probability, Unfulfilled demand (28 units)",Raise replenishment order IMMEDIATELY (+40 units),5951.67
+S04,Product P101,76,140,0.968,HIGH,83,"High stockout probability, Unfulfilled demand (64 units)",Raise replenishment order IMMEDIATELY (+83 units),3829.13
+S04,Product P102,289,399,0.947,HIGH,123,"High stockout probability, Unfulfilled demand (110 units)",Raise replenishment order IMMEDIATELY (+123 units),4943.46
+S04,Product P103,495,366,0.093,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P104,281,276,0.148,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P105,273,279,0.692,MEDIUM,20,Unfulfilled demand (6 units),Order within 2 days (+20 units),571.9
+S04,Product P201,129,171,0.835,HIGH,49,"High stockout probability, Unfulfilled demand (42 units)",Raise replenishment order IMMEDIATELY (+49 units),5095.75
+S04,Product P202,71,53,0.094,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P203,172,142,0.093,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P204,80,69,0.095,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P205,34,57,0.949,HIGH,32,"High stockout probability, Unfulfilled demand (23 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+32 units),2586.54
+S04,Product P301,236,259,0.743,HIGH,40,"High stockout probability, Unfulfilled demand (23 units)",Raise replenishment order IMMEDIATELY (+40 units),1160.59
+S04,Product P302,367,383,0.19,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P303,134,316,0.971,HIGH,206,"High stockout probability, Unfulfilled demand (182 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+206 units),4545.48
+S04,Product P304,284,316,0.33,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P305,349,319,0.104,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P401,264,373,0.801,HIGH,132,"High stockout probability, Unfulfilled demand (109 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+132 units),3808.11
+S04,Product P402,172,293,0.962,HIGH,142,"High stockout probability, Unfulfilled demand (121 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+142 units),3596.99
+S04,Product P403,95,141,0.943,HIGH,63,"High stockout probability, Unfulfilled demand (46 units)",Raise replenishment order IMMEDIATELY (+63 units),3016.19
+S04,Product P404,327,403,0.739,HIGH,0,High stockout probability,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P405,160,259,0.964,HIGH,119,"High stockout probability, Unfulfilled demand (99 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+119 units),5431.74
+S04,Product P501,53,100,0.971,HIGH,64,"High stockout probability, Unfulfilled demand (47 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+64 units),10316.04
+S04,Product P502,73,84,0.604,MEDIUM,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P503,42,62,0.939,HIGH,32,"High stockout probability, Unfulfilled demand (20 units)",Raise replenishment order IMMEDIATELY (+32 units),2738.18
+S04,Product P504,148,163,0.451,MEDIUM,36,Unfulfilled demand (15 units),Order within 2 days (+36 units),1222.94
+S04,Product P505,142,142,0.355,LOW,17,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P601,94,152,0.961,HIGH,75,"High stockout probability, Unfulfilled demand (58 units)",Raise replenishment order IMMEDIATELY (+75 units),8264.21
+S04,Product P602,126,112,0.094,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P603,102,177,0.965,HIGH,91,"High stockout probability, Unfulfilled demand (75 units)",Raise replenishment order IMMEDIATELY (+91 units),6755.35
+S04,Product P604,139,137,0.102,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S04,Product P605,96,112,0.883,HIGH,28,"High stockout probability, Unfulfilled demand (16 units)",Raise replenishment order IMMEDIATELY (+28 units),3440.41

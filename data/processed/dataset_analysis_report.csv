@@ -1,0 +1,13 @@
+metric_category,metric,value
+Dataset Summary,Total Transactions,67342.0
+Dataset Summary,Total Units Sold,1062119.0
+Dataset Summary,Total Revenue ($),98818614.32
+Dataset Summary,Avg Transaction Value ($),1467.41
+Dataset Summary,Stores Count,4.0
+Dataset Summary,Products Count,30.0
+Data Quality,Missing Values After Cleaning,0.0
+Data Quality,Duplicate Records Removed,1.0
+Data Quality,Referential Integrity %,100.0
+Inventory Analysis,Total Current Stock Units,23147.0
+Inventory Analysis,Total Inventory Valuation ($),1636994.0
+Inventory Analysis,Low Stock Items Alert Count,28.0

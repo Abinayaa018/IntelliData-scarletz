@@ -1,0 +1,260 @@
+{
+  "dataset_summary": {
+    "total_records": {
+      "transactions": 67342,
+      "inventory": 29160,
+      "products": 30,
+      "stores": 4,
+      "external_factors": 972
+    },
+    "date_range": {
+      "start": "2026-01-01",
+      "end": "2026-08-31"
+    },
+    "total_stores": 4,
+    "total_products": 30,
+    "total_categories": 6,
+    "total_transactions": 67342,
+    "total_units_sold": 1062119,
+    "total_revenue": 98818614.32,
+    "average_transaction_value": 1467.41
+  },
+  "data_quality": {
+    "missing_values_after": 0,
+    "duplicate_records_after": 0,
+    "invalid_records_handled": 44,
+    "referential_integrity_percentage": 100.0,
+    "cleaning_operations_logged": 6,
+    "quality_score": "100% (Clean & Validated)"
+  },
+  "sales_analysis": {
+    "total_revenue": 98818614.32,
+    "total_units_sold": 1062119,
+    "average_transaction_value": 1467.41,
+    "sales_by_store": [
+      {
+        "store_id": "S01",
+        "units_sold": 253315,
+        "revenue": 23519297.09,
+        "tx_count": 16793
+      },
+      {
+        "store_id": "S02",
+        "units_sold": 425283,
+        "revenue": 39639454.07,
+        "tx_count": 16961
+      },
+      {
+        "store_id": "S03",
+        "units_sold": 158991,
+        "revenue": 14790732.68,
+        "tx_count": 16881
+      },
+      {
+        "store_id": "S04",
+        "units_sold": 224530,
+        "revenue": 20869130.48,
+        "tx_count": 16707
+      }
+    ],
+    "sales_by_category": [
+      {
+        "category": "Beverages",
+        "units_sold": 277399,
+        "revenue": 26018192.79,
+        "tx_count": 11202
+      },
+      {
+        "category": "Dairy",
+        "units_sold": 246491,
+        "revenue": 22438548.46,
+        "tx_count": 11271
+      },
+      {
+        "category": "Frozen",
+        "units_sold": 121298,
+        "revenue": 17983740.76,
+        "tx_count": 11198
+      },
+      {
+        "category": "Snacks",
+        "units_sold": 241856,
+        "revenue": 12355919.24,
+        "tx_count": 11348
+      },
+      {
+        "category": "Household",
+        "units_sold": 93073,
+        "revenue": 11124426.94,
+        "tx_count": 11170
+      },
+      {
+        "category": "Personal Care",
+        "units_sold": 82002,
+        "revenue": 8897786.13,
+        "tx_count": 11153
+      }
+    ],
+    "top_5_products": [
+      {
+        "product_id": "P102",
+        "category": "Dairy",
+        "sub_category": "Curd",
+        "units_sold": 69863,
+        "revenue": 3122522.21
+      },
+      {
+        "product_id": "P302",
+        "category": "Beverages",
+        "sub_category": "Juice",
+        "units_sold": 68175,
+        "revenue": 6093052.99
+      },
+      {
+        "product_id": "P404",
+        "category": "Snacks",
+        "sub_category": "Namkeen",
+        "units_sold": 66108,
+        "revenue": 4920860.21
+      },
+      {
+        "product_id": "P401",
+        "category": "Snacks",
+        "sub_category": "Biscuits",
+        "units_sold": 62282,
+        "revenue": 2166129.06
+      },
+      {
+        "product_id": "P103",
+        "category": "Dairy",
+        "sub_category": "Butter",
+        "units_sold": 61437,
+        "revenue": 6720634.1
+      }
+    ],
+    "bottom_5_products": [
+      {
+        "product_id": "P502",
+        "category": "Household",
+        "sub_category": "Dishwash",
+        "units_sold": 14420,
+        "revenue": 1361132.89
+      },
+      {
+        "product_id": "P204",
+        "category": "Personal Care",
+        "sub_category": "Face Wash",
+        "units_sold": 11664,
+        "revenue": 1856553.88
+      },
+      {
+        "product_id": "P503",
+        "category": "Household",
+        "sub_category": "Floor Cleaner",
+        "units_sold": 10132,
+        "revenue": 1409143.17
+      },
+      {
+        "product_id": "P205",
+        "category": "Personal Care",
+        "sub_category": "Handwash",
+        "units_sold": 9340,
+        "revenue": 1020225.76
+      },
+      {
+        "product_id": "P202",
+        "category": "Personal Care",
+        "sub_category": "Soap",
+        "units_sold": 8700,
+        "revenue": 388483.78
+      }
+    ],
+    "daily_sales_count": 243
+  },
+  "inventory_analysis": {
+    "snapshot_date": "2026-08-31",
+    "total_current_stock": 23147,
+    "total_inventory_valuation": 1636994.0,
+    "stock_by_store": [
+      {
+        "store_id": "S01",
+        "closing_stock": 5169,
+        "inventory_value": 387427
+      },
+      {
+        "store_id": "S02",
+        "closing_stock": 9304,
+        "inventory_value": 633829
+      },
+      {
+        "store_id": "S03",
+        "closing_stock": 3371,
+        "inventory_value": 227468
+      },
+      {
+        "store_id": "S04",
+        "closing_stock": 5303,
+        "inventory_value": 388270
+      }
+    ],
+    "low_stock_items_count": 28,
+    "overstocked_items_count": 5
+  },
+  "store_analysis": [
+    {
+      "store_id": "S01",
+      "city": "Coimbatore",
+      "store_type": "Supermarket",
+      "floor_area_sqft": 8500,
+      "avg_daily_customers": 1250,
+      "region": "West",
+      "units_sold": 253315,
+      "revenue": 23519297.09,
+      "tx_count": 16793
+    },
+    {
+      "store_id": "S02",
+      "city": "Chennai",
+      "store_type": "Hypermarket",
+      "floor_area_sqft": 18000,
+      "avg_daily_customers": 2850,
+      "region": "North",
+      "units_sold": 425283,
+      "revenue": 39639454.07,
+      "tx_count": 16961
+    },
+    {
+      "store_id": "S03",
+      "city": "Madurai",
+      "store_type": "Express",
+      "floor_area_sqft": 4200,
+      "avg_daily_customers": 720,
+      "region": "South",
+      "units_sold": 158991,
+      "revenue": 14790732.68,
+      "tx_count": 16881
+    },
+    {
+      "store_id": "S04",
+      "city": "Salem",
+      "store_type": "Supermarket",
+      "floor_area_sqft": 7600,
+      "avg_daily_customers": 1080,
+      "region": "Central",
+      "units_sold": 224530,
+      "revenue": 20869130.48,
+      "tx_count": 16707
+    }
+  ],
+  "demand_analysis": {
+    "avg_daily_units_sold": 4370.86,
+    "peak_demand_day": {
+      "date": "2026-08-16",
+      "units_sold": 6182
+    },
+    "min_demand_day": {
+      "date": "2026-07-23",
+      "units_sold": 3962
+    }
+  }
+}

@@ -1,0 +1,6 @@
+dataset,rows_before,rows_after,columns_before,columns_after,missing_values_before,missing_values_after,duplicates_before,duplicates_after,invalid_values_before,invalid_values_after
+external_factors,972,972,8,8,18,0,0,0,18,0
+inventory,29160,29160,9,9,0,0,0,0,25,0
+products,30,30,8,8,0,0,0,0,0,0
+stores,4,4,6,6,0,0,0,0,0,0
+transactions,67344,67342,11,11,0,0,1,0,1,0

@@ -1,0 +1,31 @@
+product_id,category,sub_category,brand,mrp,cost_price,shelf_life_days,supplier_id
+P101,Dairy,Milk,Aavin,60,52,3,SUP01
+P102,Dairy,Curd,Aavin,45,38,7,SUP01
+P103,Dairy,Butter,MilkyMist,110,92,60,SUP02
+P104,Dairy,Cheese,MilkyMist,150,125,90,SUP02
+P105,Dairy,Paneer,Aavin,95,78,10,SUP01
+P201,Personal Care,Shampoo,GlowCare,120,79,730,SUP08
+P202,Personal Care,Soap,FreshGlow,45,30,900,SUP08
+P203,Personal Care,Toothpaste,DentaPlus,95,65,730,SUP09
+P204,Personal Care,Face Wash,GlowCare,160,110,540,SUP09
+P205,Personal Care,Handwash,CleanMax,110,79,730,SUP08
+P301,beverages,Soft Drink,FizzUp,50,31,180,SUP04
+P302,BEVERAGES,Juice,Fruity,90,62,120,SUP04
+P303,Beverages,Water,PureDrop,25,16,365,SUP05
+P304,Beverages,Energy Drink,Volt,120,82,240,SUP05
+P305,Beverages,Tea,BrewLeaf,180,130,365,SUP07
+P401,Snacks,Biscuits,Crispo,35,22,240,SUP06
+P402,Snacks,Chips,Crunchy,30,19,180,SUP06
+P403,Snacks,Cookies,Crispo,65,42,240,SUP06
+P404,Snacks,Namkeen,SpiceBite,75,49,180,SUP10
+P405,Snacks,Chocolate,ChocoJoy,55,36,180,SUP11
+P501,Household,Detergent,CleanMax,220,165,730,SUP12
+P502,Household,Dishwash,CleanMax,95,68,540,SUP12
+P503,Household,Floor Cleaner,ShineHome,140,98,730,SUP12
+P504,Household,Tissue,SoftTouch,80,55,730,SUP13
+P505,Household,Garbage Bags,HomeSafe,100,70,900,SUP13
+P601,Frozen,Frozen Peas,FrostFarm,140,105,180,SUP14
+P602,Frozen,French Fries,FrostFarm,180,135,180,SUP14
+P603,Frozen,Ice Cream,CoolJoy,90,62,120,SUP15
+P604,Frozen,Frozen Paratha,FrostFarm,160,120,180,SUP14
+P605,Frozen,Nuggets,CoolJoy,210,155,180,SUP15
