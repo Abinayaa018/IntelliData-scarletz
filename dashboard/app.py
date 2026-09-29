@@ -268,7 +268,7 @@ elif selected_page == "📈 Page 2: Retail Intelligence (Analytics)":
                 color="store_id",
                 text_auto=".2s",
                 title="Total Revenue per Store ID ($)",
-                color_discrete_sequence=px.colors.sequential.cyan
+                color_discrete_sequence=["#00f3ff", "#00d2ff", "#0099ff", "#0066ff"]
             )
             fig_store.update_layout(template="plotly_dark", height=380)
             st.plotly_chart(fig_store, use_container_width=True)
@@ -284,7 +284,7 @@ elif selected_page == "📈 Page 2: Retail Intelligence (Analytics)":
                 values="revenue",
                 hole=0.4,
                 title="Revenue Share by Product Category",
-                color_discrete_sequence=px.colors.sequential.Plasma
+                color_discrete_sequence=["#bf00ff", "#00f3ff", "#00ff88", "#ffaa00", "#ff0055"]
             )
             fig_cat.update_layout(template="plotly_dark", height=380)
             st.plotly_chart(fig_cat, use_container_width=True)
