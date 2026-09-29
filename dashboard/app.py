@@ -268,7 +268,7 @@ elif selected_page == "📈 Page 2: Retail Intelligence (Analytics)":
                 color="store_id",
                 text_auto=".2s",
                 title="Total Revenue per Store ID ($)",
-                color_discrete_sequence=px.colors.sequential.Cyan
+                color_discrete_sequence=px.colors.sequential.cyan
             )
             fig_store.update_layout(template="plotly_dark", height=380)
             st.plotly_chart(fig_store, use_container_width=True)
