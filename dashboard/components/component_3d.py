@@ -6,6 +6,7 @@ Renders the rotatable, zoomable 3D supermarket aisle component and cinematic lan
 from pathlib import Path
 import json
 import streamlit as st
+
 import streamlit.components.v1 as components
 
 AISLE_HTML_PATH = Path(__file__).resolve().parent / "3d_aisle_twin.html"
