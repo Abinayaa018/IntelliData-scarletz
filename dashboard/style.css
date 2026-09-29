@@ -1,56 +1,146 @@
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Orbitron:wght@600;800;900&family=Rajdhani:wght@600;700&family=JetBrains+Mono:wght@400;600&display=swap');
 
-/* Master Sci-Fi Mission Control Styling */
+/* HIDE ALL STREAMLIT CHROME & HEADER DEPLOY BUTTONS */
+header[data-testid="stHeader"], 
+footer, 
+#MainMenu, 
+.stDeployButton, 
+div[data-testid="stDecoration"] {
+    display: none !important;
+    visibility: hidden !important;
+}
+
+/* Master Color Palette & Typography */
 :root {
     --bg-dark: #070a14;
-    --card-bg: rgba(15, 23, 42, 0.75);
+    --card-bg: rgba(15, 23, 42, 0.82);
     --border-glow: rgba(0, 243, 255, 0.25);
     --accent-cyan: #00f3ff;
     --accent-violet: #bf00ff;
     --risk-high: #ff0055;
     --risk-med: #ffaa00;
     --risk-low: #00ff88;
-    --font-heading: 'Orbitron', sans-serif;
-    --font-body: 'Rajdhani', sans-serif;
+    --font-heading: 'Orbitron', 'Rajdhani', sans-serif;
+    --font-body: 'Inter', system-ui, -apple-system, sans-serif;
     --font-mono: 'JetBrains Mono', monospace;
 }
 
 body, .stApp {
     background-color: var(--bg-dark) !important;
-    color: #e2e8f0 !important;
+    color: #f8fafc !important;
     font-family: var(--font-body) !important;
+    font-size: 0.92rem;
+    line-height: 1.5;
 }
 
-/* Header & Typography */
+/* Headings */
 h1, h2, h3, h4, h5, h6 {
     font-family: var(--font-heading) !important;
-    letter-spacing: 1px;
+    letter-spacing: 0.5px;
     color: #ffffff !important;
 }
 
-h1 {
+h1.page-title {
+    font-size: 1.6rem !important;
+    font-weight: 800 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    margin-bottom: 4px !important;
     background: linear-gradient(90deg, #00f3ff, #bf00ff);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
 }
 
-/* Glassmorphism Card Container */
+.page-subtitle {
+    font-family: var(--font-body);
+    color: #94a3b8;
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+}
+
+/* Glassmorphism Cards */
 .glass-card {
     background: var(--card-bg);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--border-glow);
-    border-radius: 12px;
-    padding: 18px 24px;
-    margin-bottom: 16px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 243, 255, 0.05);
-    transition: all 0.3s ease;
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 14px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    transition: all 0.25s ease;
 }
 
 .glass-card:hover {
-    border-color: rgba(0, 243, 255, 0.5);
-    box-shadow: 0 10px 40px 0 rgba(0, 243, 255, 0.15);
+    border-color: rgba(0, 243, 255, 0.45);
+    box-shadow: 0 10px 35px 0 rgba(0, 243, 255, 0.12);
+}
+
+/* Equal Height KPI Cards */
+.kpi-tile {
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    text-align: center;
+    min-height: 110px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.kpi-label {
+    font-family: var(--font-body);
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-value {
+    font-family: var(--font-heading);
+    font-size: 1.65rem;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.4);
+    margin: 4px 0;
+}
+
+/* Risk Badges */
+.badge-high {
+    background: rgba(255, 0, 85, 0.25);
+    color: #ff3377;
+    border: 1px solid var(--risk-high);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.badge-medium {
+    background: rgba(255, 170, 0, 0.25);
+    color: #ffbb33;
+    border: 1px solid var(--risk-med);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
+}
+
+.badge-low {
+    background: rgba(0, 255, 136, 0.25);
+    color: #33ff99;
+    border: 1px solid var(--risk-low);
+    padding: 3px 9px;
+    border-radius: 4px;
+    font-family: var(--font-heading);
+    font-size: 0.78rem;
+    font-weight: 700;
 }
 
 /* Demo Data Badge */
@@ -59,89 +149,59 @@ h1 {
     background: linear-gradient(135deg, #bf00ff, #ff0055);
     color: #ffffff;
     font-family: var(--font-heading);
-    font-size: 0.75rem;
+    font-size: 0.72rem;
     font-weight: 800;
-    padding: 4px 12px;
-    border-radius: 20px;
-    letter-spacing: 1.5px;
-    box-shadow: 0 0 12px rgba(191, 0, 255, 0.6);
-    animation: pulse-glow 2s infinite alternate;
-}
-
-@keyframes pulse-glow {
-    0% { box-shadow: 0 0 8px rgba(191, 0, 255, 0.5); }
-    100% { box-shadow: 0 0 18px rgba(255, 0, 85, 0.9); }
-}
-
-/* KPI Counter Tile */
-.kpi-tile {
-    background: rgba(15, 23, 42, 0.85);
-    border: 1px solid rgba(0, 243, 255, 0.2);
-    border-radius: 10px;
-    padding: 16px;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-
-.kpi-label {
-    font-family: var(--font-body);
-    font-size: 0.9rem;
-    color: #94a3b8;
-    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 12px;
     letter-spacing: 1px;
+    box-shadow: 0 0 10px rgba(191, 0, 255, 0.5);
 }
 
-.kpi-value {
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    font-weight: 800;
-    color: var(--accent-cyan);
-    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
-    margin: 6px 0;
-}
-
-/* Risk Badges */
-.badge-high {
-    background: rgba(255, 0, 85, 0.2);
-    color: var(--risk-high);
-    border: 1px solid var(--risk-high);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-family: var(--font-heading);
+/* Stepper Progress Bar */
+.stepper-container {
+    background: rgba(15, 23, 42, 0.7);
+    border: 1px solid rgba(0, 243, 255, 0.15);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
     font-size: 0.8rem;
+}
+
+.step-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #64748b;
+    margin-bottom: 4px;
+}
+
+.step-active {
+    color: var(--accent-cyan) !important;
     font-weight: 700;
 }
 
-.badge-medium {
-    background: rgba(255, 170, 0, 0.2);
-    color: var(--risk-med);
-    border: 1px solid var(--risk-med);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    font-weight: 700;
+.step-done {
+    color: #00ff88 !important;
 }
 
-.badge-low {
-    background: rgba(0, 255, 136, 0.2);
-    color: var(--risk-low);
-    border: 1px solid var(--risk-low);
-    padding: 3px 10px;
-    border-radius: 6px;
-    font-family: var(--font-heading);
-    font-size: 0.8rem;
-    font-weight: 700;
-}
-
-/* Streamlit Widget Overrides */
-.stSelectbox, .stSlider, .stMultiSelect {
-    background: rgba(15, 23, 42, 0.8) !important;
-    border-radius: 8px !important;
-}
-
+/* Sidebar Custom Styling */
 div[data-testid="stSidebar"] {
-    background-color: #0b0f19 !important;
+    background-color: #080d1a !important;
     border-right: 1px solid rgba(0, 243, 255, 0.15) !important;
+}
+
+div[data-testid="stSidebar"] h2, div[data-testid="stSidebar"] h3 {
+    font-size: 1.05rem !important;
+    margin-top: 10px !important;
+    margin-bottom: 6px !important;
+}
+
+/* Empty State Banner */
+.empty-state-card {
+    background: rgba(15, 23, 42, 0.9);
+    border: 2px dashed rgba(0, 243, 255, 0.4);
+    border-radius: 12px;
+    padding: 36px 24px;
+    text-align: center;
+    margin: 20px 0;
 }

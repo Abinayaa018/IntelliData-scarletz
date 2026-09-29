@@ -5,13 +5,13 @@
     <title>STOCKSENSE 3D Store Digital Twin</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
             background-color: #070a14;
             color: #e2e8f0;
-            font-family: 'Rajdhani', sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             overflow: hidden;
-            width: 100vw;
-            height: 100vh;
         }
         #canvas-container {
             width: 100%;
@@ -23,31 +23,36 @@
         #ui-overlay {
             position: absolute;
             top: 12px;
-            left: 16px;
+            left: 14px;
             z-index: 10;
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(10px);
+            background: rgba(15, 23, 42, 0.88);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             border: 1px solid rgba(0, 243, 255, 0.3);
             border-radius: 8px;
-            padding: 10px 14px;
+            padding: 8px 12px;
             display: flex;
-            gap: 12px;
+            gap: 10px;
             align-items: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
         }
         .ui-btn {
             background: linear-gradient(135deg, #00f3ff, #bf00ff);
             color: #070a14;
             font-weight: 700;
             border: none;
-            padding: 6px 14px;
+            padding: 6px 12px;
             border-radius: 6px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             transition: all 0.2s ease;
         }
         .ui-btn:hover {
             box-shadow: 0 0 12px rgba(0, 243, 255, 0.8);
-            transform: scale(1.05);
+            transform: scale(1.03);
+        }
+        .btn-green {
+            background: linear-gradient(135deg, #00ff88, #00f3ff);
         }
         #tooltip {
             position: absolute;
@@ -56,10 +61,11 @@
             border: 1px solid #00f3ff;
             border-radius: 6px;
             padding: 8px 12px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             pointer-events: none;
             z-index: 20;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
+            line-height: 1.4;
         }
         #fallback-2d {
             display: none;
@@ -68,46 +74,60 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: #ff0055;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            font-weight: 700;
             text-align: center;
+            background: rgba(15,23,42,0.9);
+            padding: 20px;
+            border-radius: 10px;
+            border: 1px solid #ff0055;
+        }
+        .item-caption {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 0.75rem;
+            color: #64748b;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 2px 8px;
+            border-radius: 4px;
         }
     </style>
-    <!-- Three.js CDN & OrbitControls -->
+    <!-- Pinned Three.js r128 & OrbitControls -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 </head>
 <body>
     <div id="canvas-container"></div>
     <div id="ui-overlay">
-        <span style="font-weight: 700; color: #00f3ff; font-family: monospace;">3D DIGITAL TWIN</span>
+        <span style="font-weight: 700; color: #00f3ff; font-family: monospace; font-size: 0.85rem;">3D DIGITAL TWIN</span>
         <button class="ui-btn" id="btn-replay">Replay 7-Day Drain</button>
-        <button class="ui-btn" id="btn-refill" style="background: linear-gradient(135deg, #00ff88, #00f3ff);">Refill Order</button>
-        <span id="status-text" style="font-size: 0.8rem; color: #94a3b8;">Click item to inspect</span>
+        <button class="ui-btn btn-green" id="btn-refill">Apply Orders</button>
+        <span id="status-text" style="font-size: 0.78rem; color: #94a3b8;">Click item to inspect details</span>
     </div>
     <div id="tooltip"></div>
-    <div id="fallback-2d">WebGL unavailable. Switching to 2D Fallback Heatmap Mode.</div>
+    <div id="fallback-2d">WebGL is unavailable in this environment.<br/>Displaying 2D Risk Heatmap Fallback Mode.</div>
+    <div class="item-caption" id="item-count-caption">Showing top items by risk</div>
 
     <script>
         let scene, camera, renderer, controls;
         let itemCrates = [];
         let raycaster = new THREE.Raycaster();
         let mouse = new THREE.Vector2();
-        let hoveredItem = null;
         let isAnimating = false;
 
-        // Default item data passed from Streamlit
+        // Passed dynamically from Python or defaults
         let itemsData = [
-            { id: 'S01-P001', store: 'S01', product: 'Milk 1L', category: 'Dairy', stock: 20, forecast: 70, prob: 0.85, risk: 'HIGH' },
-            { id: 'S01-P002', store: 'S01', product: 'Bread 400g', category: 'Bakery', stock: 45, forecast: 50, prob: 0.25, risk: 'LOW' },
-            { id: 'S01-P003', store: 'S01', product: 'Soda 500ml', category: 'Beverages', stock: 30, forecast: 65, prob: 0.60, risk: 'MEDIUM' },
-            { id: 'S01-P004', store: 'S01', product: 'Rice 5kg', category: 'Pantry', stock: 15, forecast: 25, prob: 0.45, risk: 'MEDIUM' },
-            { id: 'S01-P005', store: 'S01', product: 'Shampoo 250ml', category: 'Personal Care', stock: 25, forecast: 20, prob: 0.10, risk: 'LOW' }
+            { id: 'S01-P001', store: 'S01', store_type: 'Express', product: 'Fresh Organic Milk 1L', category: 'Dairy', stock: 20, forecast: 70, prob: 0.85, risk: 'HIGH', order: 55, reasons: 'High stockout probability' },
+            { id: 'S01-P002', store: 'S01', store_type: 'Express', product: 'Artisanal White Bread', category: 'Bakery', stock: 45, forecast: 50, prob: 0.25, risk: 'LOW', order: 0, reasons: 'Stable demand' },
+            { id: 'S01-P003', store: 'S01', store_type: 'Express', product: 'Sparkling Soda 500ml', category: 'Beverages', stock: 30, forecast: 65, prob: 0.60, risk: 'MEDIUM', order: 40, reasons: 'Stock cover inadequate' },
+            { id: 'S02-P004', store: 'S02', store_type: 'Supermarket', product: 'Basmati Rice 5kg', category: 'Pantry', stock: 15, forecast: 30, prob: 0.72, risk: 'HIGH', order: 25, reasons: 'High stockout probability' },
+            { id: 'S03-P005', store: 'S03', store_type: 'Hypermarket', product: 'Herbal Shampoo 250ml', category: 'Personal Care', stock: 50, forecast: 20, prob: 0.10, risk: 'LOW', order: 0, reasons: 'Adequate stock' }
         ];
 
         function init() {
             const container = document.getElementById('canvas-container');
             
-            // WebGL Support Check
             try {
                 renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
             } catch (e) {
@@ -115,15 +135,15 @@
                 return;
             }
 
-            renderer.setSize(container.clientWidth, container.clientHeight);
-            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.setSize(container.clientWidth || window.innerWidth, container.clientHeight || window.innerHeight);
+            renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
             container.appendChild(renderer.domElement);
 
             scene = new THREE.Scene();
-            scene.fog = new THREE.FogExp2(0x070a14, 0.025);
+            scene.fog = new THREE.FogExp2(0x070a14, 0.02);
 
-            camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.1, 1000);
-            camera.position.set(0, 18, 28);
+            camera = new THREE.PerspectiveCamera(45, (container.clientWidth || window.innerWidth) / (container.clientHeight || window.innerHeight), 0.1, 1000);
+            camera.position.set(0, 16, 26);
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
             controls.enableDamping = true;
@@ -131,23 +151,23 @@
             controls.maxPolarAngle = Math.PI / 2.05;
 
             // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
             scene.add(ambientLight);
 
-            const dirLight = new THREE.DirectionalLight(0x00f3ff, 0.8);
-            dirLight.position.set(10, 20, 10);
+            const dirLight = new THREE.DirectionalLight(0x00f3ff, 0.9);
+            dirLight.position.set(12, 22, 12);
             scene.add(dirLight);
 
-            const pointLight = new THREE.PointLight(0xbf00ff, 1.2, 50);
-            pointLight.position.set(-10, 15, -10);
+            const pointLight = new THREE.PointLight(0xbf00ff, 1.2, 60);
+            pointLight.position.set(-12, 16, -12);
             scene.add(pointLight);
 
-            // Ground Grid
-            const grid = new THREE.GridHelper(40, 40, 0x00f3ff, 0x1e293b);
+            // Grid Floor
+            const grid = new THREE.GridHelper(44, 44, 0x00f3ff, 0x1e293b);
             grid.position.y = 0;
             scene.add(grid);
 
-            createStoreShelves();
+            buildStoreAisles();
 
             window.addEventListener('resize', onWindowResize);
             renderer.domElement.addEventListener('mousemove', onMouseMove);
@@ -165,60 +185,72 @@
             return 0x00ff88;
         }
 
-        function createStoreShelves() {
-            // Clear existing
-            itemCrates.forEach(c => scene.remove(c.mesh));
+        function buildStoreAisles() {
+            itemCrates.forEach(c => {
+                scene.remove(c.mesh);
+                if (c.beacon) scene.remove(c.beacon);
+            });
             itemCrates = [];
 
-            // Base Shelf Bay Structure
-            const shelfGeo = new THREE.BoxGeometry(22, 0.4, 6);
+            // Render top 60 items max
+            const displayItems = itemsData.slice(0, 60);
+            document.getElementById('item-count-caption').innerText = `Rendering ${displayItems.length} items in 3D digital twin`;
+
+            // Shelf Base Geometry
+            const shelfGeo = new THREE.BoxGeometry(20, 0.35, 5);
             const shelfMat = new THREE.MeshStandardMaterial({ color: 0x1e293b, metalness: 0.8, roughness: 0.2 });
-            
-            for (let s = 0; s < 3; s++) {
+
+            const numRows = Math.ceil(displayItems.length / 5);
+            for (let r = 0; r < Math.min(numRows, 4); r++) {
                 const shelf = new THREE.Mesh(shelfGeo, shelfMat);
-                shelf.position.set(0, s * 4 + 0.2, 0);
+                shelf.position.set(0, r * 3.8 + 0.2, 0);
                 scene.add(shelf);
             }
 
-            // Create Product Crates
             const startX = -8;
-            itemsData.forEach((item, idx) => {
-                const xPos = startX + (idx % 5) * 4;
-                const shelfIndex = Math.floor(idx / 5);
-                const yPos = shelfIndex * 4 + 1.2;
+            displayItems.forEach((item, idx) => {
+                const row = Math.floor(idx / 5);
+                const col = idx % 5;
+                const xPos = startX + col * 4;
+                const yPos = row * 3.8 + 1.1;
 
                 const colorHex = getColorForRisk(item.risk);
-                const height = Math.max(0.6, (item.stock / (item.forecast + 1e-5)) * 2.5);
+                const heightRatio = Math.min(2.5, Math.max(0.5, (item.stock / (item.forecast + 1e-5)) * 2.2));
 
-                const crateGeo = new THREE.BoxGeometry(2.5, height, 2.5);
+                const crateGeo = new THREE.BoxGeometry(2.2, heightRatio, 2.2);
                 const crateMat = new THREE.MeshStandardMaterial({
                     color: colorHex,
                     emissive: colorHex,
-                    emissiveIntensity: item.risk === 'HIGH' ? 0.6 : 0.2,
+                    emissiveIntensity: item.risk === 'HIGH' ? 0.6 : 0.15,
                     roughness: 0.3,
                     metalness: 0.5
                 });
 
                 const crateMesh = new THREE.Mesh(crateGeo, crateMat);
-                crateMesh.position.set(xPos, yPos + height / 2, 0);
+                crateMesh.position.set(xPos, yPos + heightRatio / 2, 0);
                 crateMesh.userData = item;
                 scene.add(crateMesh);
 
-                // Add Warning Beacon for HIGH risk items
+                let beaconMesh = null;
                 if (item.risk === 'HIGH') {
-                    const beaconGeo = new THREE.CylinderGeometry(0.1, 0.4, 8, 16);
+                    const beaconGeo = new THREE.CylinderGeometry(0.08, 0.35, 7, 16);
                     const beaconMat = new THREE.MeshBasicMaterial({
                         color: 0xff0055,
                         transparent: true,
-                        opacity: 0.4
+                        opacity: 0.45
                     });
-                    const beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
-                    beaconMesh.position.set(xPos, yPos + 4, 0);
+                    beaconMesh = new THREE.Mesh(beaconGeo, beaconMat);
+                    beaconMesh.position.set(xPos, yPos + 3.5, 0);
                     scene.add(beaconMesh);
-                    crateMesh.userData.beacon = beaconMesh;
                 }
 
-                itemCrates.push({ mesh: crateMesh, data: item, baseHeight: height, originalStock: item.stock });
+                itemCrates.push({
+                    mesh: crateMesh,
+                    beacon: beaconMesh,
+                    data: item,
+                    baseHeight: heightRatio,
+                    originalStock: item.stock
+                });
             });
         }
 
@@ -234,14 +266,15 @@
             if (intersects.length > 0) {
                 const item = intersects[0].object.userData;
                 tooltip.style.display = 'block';
-                tooltip.style.left = (event.clientX + 15) + 'px';
-                tooltip.style.top = (event.clientY + 15) + 'px';
+                tooltip.style.left = (event.clientX + 14) + 'px';
+                tooltip.style.top = (event.clientY + 14) + 'px';
                 tooltip.innerHTML = `
-                    <strong style="color:#00f3ff">${item.product} (${item.store})</strong><br/>
-                    Category: ${item.category}<br/>
-                    Current Stock: ${item.stock} units<br/>
-                    7-Day Forecast: ${item.forecast} units<br/>
-                    Risk: <span style="color:${item.risk==='HIGH'?'#ff0055':(item.risk==='MEDIUM'?'#ffaa00':'#00ff88')}">${item.risk} (${(item.prob*100).toFixed(0)}%)</span>
+                    <strong style="color:#00f3ff; font-size:0.9rem;">Store ${item.store} — ${item.product}</strong><br/>
+                    <span style="color:#94a3b8;">Category: ${item.category}</span><br/>
+                    <strong>Current Stock:</strong> ${item.stock} units<br/>
+                    <strong>7-Day Forecast:</strong> ${item.forecast} units<br/>
+                    <strong>Risk Level:</strong> <span style="color:${item.risk==='HIGH'?'#ff0055':(item.risk==='MEDIUM'?'#ffaa00':'#00ff88')}">${item.risk} (${(item.prob*100).toFixed(0)}%)</span><br/>
+                    <strong>Reorder Needed:</strong> +${item.order} units
                 `;
             } else {
                 tooltip.style.display = 'none';
@@ -253,53 +286,54 @@
             const intersects = raycaster.intersectObjects(itemCrates.map(c => c.mesh));
             if (intersects.length > 0) {
                 const item = intersects[0].object.userData;
-                document.getElementById('status-text').innerText = `Selected: ${item.product} (${item.risk} Risk)`;
+                document.getElementById('status-text').innerText = `Selected: Store ${item.store} — ${item.product} (${item.risk} Risk)`;
             }
         }
 
         function animateForecastDrain() {
             if (isAnimating) return;
             isAnimating = true;
-            let step = 0;
+            let day = 0;
             const interval = setInterval(() => {
-                step++;
+                day++;
                 itemCrates.forEach(c => {
-                    const drainedStock = Math.max(0, c.originalStock - Math.round((c.data.forecast / 7.0) * step));
-                    const newHeight = Math.max(0.2, (drainedStock / (c.data.forecast + 1e-5)) * 2.5);
+                    const drained = Math.max(0, c.originalStock - Math.round((c.data.forecast / 7.0) * day));
+                    const newHeight = Math.max(0.2, (drained / (c.data.forecast + 1e-5)) * 2.2);
                     c.mesh.scale.y = newHeight / c.baseHeight;
                 });
-                document.getElementById('status-text').innerText = `Simulating 7-Day Demand Drain... Day ${step}/7`;
-                if (step >= 7) {
+                document.getElementById('status-text').innerText = `Simulating 7-Day Demand Drain... Day ${day}/7`;
+                if (day >= 7) {
                     clearInterval(interval);
                     isAnimating = false;
-                    document.getElementById('status-text').innerText = `Drain Complete: Stockouts exposed!`;
+                    document.getElementById('status-text').innerText = `7-Day Drain Complete: Stock-outs exposed in red crates!`;
                 }
-            }, 400);
+            }, 350);
         }
 
         function animateOrderRefill() {
             itemCrates.forEach(c => {
                 c.mesh.scale.y = 1.0;
             });
-            document.getElementById('status-text').innerText = `Replenishment order delivered! Shelves refilled.`;
+            document.getElementById('status-text').innerText = `Recommended replenishment applied! Shelves refilled.`;
         }
 
         function onWindowResize() {
             const container = document.getElementById('canvas-container');
-            camera.aspect = container.clientWidth / container.clientHeight;
+            const w = container.clientWidth || window.innerWidth;
+            const h = container.clientHeight || window.innerHeight;
+            camera.aspect = w / h;
             camera.updateProjectionMatrix();
-            renderer.setSize(container.clientWidth, container.clientHeight);
+            renderer.setSize(w, h);
         }
 
         function animate() {
             requestAnimationFrame(animate);
             controls.update();
 
-            // Pulse warning beacons
             itemCrates.forEach(c => {
-                if (c.mesh.userData.beacon) {
-                    c.mesh.userData.beacon.rotation.y += 0.03;
-                    c.mesh.userData.beacon.material.opacity = 0.3 + Math.sin(Date.now() * 0.005) * 0.2;
+                if (c.beacon) {
+                    c.beacon.rotation.y += 0.03;
+                    c.beacon.material.opacity = 0.35 + Math.sin(Date.now() * 0.006) * 0.25;
                 }
             });
 

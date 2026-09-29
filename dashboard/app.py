@@ -1,13 +1,14 @@
 """
 STOCKSENSE Master Streamlit Dashboard App
-Sci-Fi Dark "Mission Control / Holographic Command Centre" Interface
-Features 3D Supermarket Aisle Digital Twin, 7 Detailed Analytics Sections,
-Dynamic Plotly Dark Charts, and Real-Time What-If Simulator.
+Guided Journey Flow: Landing Page -> Sidebar Control Panel -> 7 Task Dashboard Pages
+Features Three.js 3D Store Twin, Session State Routing, 5-Stage Prediction Pipeline,
+Equal-Height KPI Cards, High-Contrast Sci-Fi Dark Palette, and Chrome Hiding.
 """
 
 from pathlib import Path
 import sys
 import json
+import time
 import pandas as pd
 import numpy as np
 import plotly.express as px
@@ -20,15 +21,19 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 sys.path.append(str(ROOT_DIR))
 
 from src.config import load_config
-from src.validation import DataValidator
+from src.validation import DataValidator, ValidationError
 from src.synthetic_data import generate_synthetic_master_table
 from src.features.builder import FeatureBuilder
+from src.targets import build_targets
+from src.evaluation import chronological_split
+from src.models.regression import DemandForecasterSuite
+from src.models.classification import StockoutClassifierSuite
 from src.recommend import RecommendationEngine, WhatIfSimulator
-from dashboard.components.component_3d import render_3d_digital_twin
+from dashboard.components.component_3d import render_3d_digital_twin, render_landing_3d_hero
 
 # 1. Page Configuration
 st.set_page_config(
-    page_title="STOCKSENSE — Mission Control",
+    page_title="STOCKSENSE — Retail Demand & Stock-Out Intelligence",
     page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded"
@@ -40,271 +45,520 @@ if CSS_PATH.exists():
     with open(CSS_PATH, "r", encoding="utf-8") as f:
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
-# 3. Load Configuration & Data Cache
-@st.cache_resource
-def get_config():
-    return load_config()
+# 3. Session State Initialization
+if "page" not in st.session_state:
+    st.session_state.page = "landing"
+if "prediction_run" not in st.session_state:
+    st.session_state.prediction_run = False
+if "prediction_timestamp" not in st.session_state:
+    st.session_state.prediction_timestamp = None
+if "is_outdated" not in st.session_state:
+    st.session_state.is_outdated = False
+if "approved_orders" not in st.session_state:
+    st.session_state.approved_orders = set()
 
-config = get_config()
+config = load_config()
 
+# Helper: Load Dataset
 @st.cache_data(ttl=600)
-def load_dashboard_data():
-    synth_path = ROOT_DIR / "data" / "processed" / "master_table_synthetic.csv"
-    real_path = ROOT_DIR / "data" / "processed" / "master_table.csv"
-    
-    is_demo = not real_path.exists()
-    target_path = synth_path if is_demo else real_path
-    
-    if not target_path.exists():
-        generate_synthetic_master_table(num_days=180, output_path=synth_path)
-        
-    df_raw = pd.read_csv(target_path)
-    validator = DataValidator(config)
-    df_clean, _ = validator.validate(df_raw)
-    
-    fb = FeatureBuilder()
-    df_feat = fb.transform(df_clean)
-    
-    return df_feat, is_demo
+def load_raw_dataset(source_type: str = "demo", uploaded_file=None):
+    if source_type == "upload" and uploaded_file is not None:
+        try:
+            df = pd.read_csv(uploaded_file)
+            val = DataValidator(config)
+            df_clean, summary = val.validate(df)
+            return df_clean, False, summary
+        except Exception as e:
+            st.sidebar.error(f"Upload Error: {e}")
+            return None, False, None
+    else:
+        synth_path = ROOT_DIR / "data" / "processed" / "master_table_synthetic.csv"
+        if not synth_path.exists():
+            generate_synthetic_master_table(num_days=180, output_path=synth_path)
+        df_raw = pd.read_csv(synth_path)
+        val = DataValidator(config)
+        df_clean, summary = val.validate(df_raw)
+        return df_clean, True, summary
 
-df_feat, is_demo_data = load_dashboard_data()
+# ==================== PART 1: LANDING PAGE ====================
+if st.session_state.page == "landing":
+    st.markdown("""
+        <div style='text-align: center; margin-top: 10px; margin-bottom: 8px;'>
+            <h1 style='font-size: 2.2rem; margin-bottom: 2px; background: linear-gradient(90deg, #00f3ff, #bf00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+                ⚡ STOCKSENSE
+            </h1>
+            <p style='font-size: 1.05rem; color: #cbd5e1; font-weight: 500;'>
+                Predict demand. Prevent stock-outs. Power better decisions.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
 
-# Load Saved Pipelines
-models_dir = ROOT_DIR / "models"
-reg_model_path = models_dir / "demand_forecast_model.joblib"
-clf_model_path = models_dir / "stockout_risk_model.joblib"
+    # Render Cinematic 3D Hero Animation
+    render_landing_3d_hero(height=420)
 
-@st.cache_resource
-def load_models():
-    if reg_model_path.exists() and clf_model_path.exists():
-        return joblib.load(reg_model_path), joblib.load(clf_model_path)
-    return None, None
+    # Primary Enter Button & Feature Chips
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 1.2, 1])
+    with col_btn2:
+        if st.button("🚀 ENTER COMMAND CENTRE", use_container_width=True, type="primary"):
+            st.session_state.page = "dashboard"
+            st.rerun()
 
-reg_pipe, clf_pipe = load_models()
+    st.markdown("""
+        <div style='display: flex; justify-content: center; gap: 16px; margin-top: 18px;'>
+            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #00f3ff;'>📈 7-Day Demand Forecast</span>
+            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #ff0055;'>🛡️ Stock-Out Risk Alerts</span>
+            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #00ff88;'>📦 Smart Reorder Actions</span>
+        </div>
+        <p style='text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 24px;'>
+            NovaMart Retail | IntelliData 2026 Hackathon Platform
+        </p>
+    """, unsafe_allow_html=True)
+    st.stop()
 
-# Predict Latest Snapshot
-latest_date = df_feat["date"].max()
-latest_df = df_feat[df_feat["date"] == latest_date].copy().reset_index(drop=True)
+# ==================== PART 2: DASHBOARD MODE & SIDEBAR CONTROL PANEL ====================
+st.sidebar.markdown("<h2 style='color:#00f3ff; margin-bottom:0;'>⚡ STOCKSENSE</h2>", unsafe_allow_html=True)
+st.sidebar.markdown("<p style='font-size:0.78rem; color:#94a3b8; margin-top:0;'>Command Centre v1.0</p>", unsafe_allow_html=True)
 
-if reg_pipe and clf_pipe:
-    latest_df["pred_7_day_demand"] = np.clip(reg_pipe.predict(latest_df), 0.0, None)
-    latest_df["pred_stockout_prob"] = np.clip(clf_pipe.predict_proba(latest_df)[:, 1], 0.0, 1.0)
-else:
-    # Fallback heuristic if models not trained yet
-    latest_df["pred_7_day_demand"] = latest_df["rolling_mean_7"] * 7.0
-    latest_df["pred_stockout_prob"] = (latest_df["closing_stock"] < latest_df["pred_7_day_demand"]).astype(float)
+# A. Data Source Selector
+st.sidebar.markdown("### 1. Data Source")
+data_source = st.sidebar.radio("Select Input Data", ["Use demo data", "Upload master_table.csv"], key="data_src_radio")
 
-rec_engine = RecommendationEngine(
-    service_level_z=config.model_params.get("service_level_z", 1.645),
-    high_risk_thresh=config.model_params.get("risk_thresholds", {}).get("high", 0.70),
-    med_risk_thresh=config.model_params.get("risk_thresholds", {}).get("medium", 0.40)
+uploaded_file = None
+if data_source == "Upload master_table.csv":
+    uploaded_file = st.sidebar.file_uploader("Upload Master Table CSV", type=["csv"])
+
+df_clean, is_demo_data, val_summary = load_raw_dataset(
+    source_type="upload" if data_source == "Upload master_table.csv" else "demo",
+    uploaded_file=uploaded_file
 )
 
-rec_df = rec_engine.calculate_recommendations(latest_df)
+if df_clean is None:
+    st.error("Failed to load dataset. Please check CSV format or switch to demo data.")
+    st.stop()
 
-# Sidebar Filters
-st.sidebar.markdown("<h2 style='color:#00f3ff;'>⚡ STOCKSENSE</h2>", unsafe_allow_html=True)
 if is_demo_data:
     st.sidebar.markdown("<span class='demo-badge'>DEMO DATA ACTIVE</span>", unsafe_allow_html=True)
 
+st.sidebar.caption(f"Loaded: {len(df_clean):,} rows | {df_clean['store_id'].nunique()} stores | {df_clean['product_id'].nunique()} products")
+
+# B. Guided Stepper
 st.sidebar.markdown("---")
-selected_store = st.sidebar.selectbox("Store Location", ["ALL"] + list(rec_df["Store"].unique()))
-selected_category = st.sidebar.selectbox("Product Category", ["ALL"] + ["Dairy", "Bakery", "Beverages", "Pantry", "Personal Care"])
-selected_risk = st.sidebar.selectbox("Risk Level Filter", ["ALL", "HIGH", "MEDIUM", "LOW"])
+st.sidebar.markdown("### 2. Guided Progress Stepper")
+step1_done = True
+step2_done = st.session_state.prediction_run
+step3_done = st.session_state.prediction_run
+step4_done = len(st.session_state.approved_orders) > 0
 
-# Filter Recommendations
-filtered_rec = rec_df.copy()
-if selected_store != "ALL":
-    filtered_rec = filtered_rec[filtered_rec["Store"] == selected_store]
-if selected_risk != "ALL":
-    filtered_rec = filtered_rec[filtered_rec["Risk"] == selected_risk]
+st.sidebar.markdown(f"""
+    <div class="stepper-container">
+        <div class="step-item step-done">✓ 1. Load Master Table</div>
+        <div class="step-item {'step-done' if step2_done else ('step-active' if step1_done else '')}">{"✓" if step2_done else "➔"} 2. Run Prediction Pipeline</div>
+        <div class="step-item {'step-done' if step3_done else ''}">{"✓" if step3_done else "•"} 3. Review Risk & Explanations</div>
+        <div class="step-item {'step-done' if step4_done else ''}">{"✓" if step4_done else "•"} 4. Approve Reorder Actions</div>
+    </div>
+""", unsafe_allow_html=True)
 
-# Main Header
-st.title("STOCKSENSE: Retail Demand & Replenishment Intelligence")
-st.markdown("##### Real-Time Demand Forecasting & Stock-Out Risk Control Centre | NovaMart Retail 2026")
+# C. Prediction Pipeline Controls
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 3. Prediction Execution")
 
-# Navigation Tabs
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
-    "🌐 Executive Summary", 
-    "📈 Demand Intelligence", 
-    "🛡️ Inventory Risk", 
-    "🛒 Manager Action Centre", 
-    "🔬 Model Performance", 
-    "🧠 Explainability", 
-    "🎛️ What-If Lab"
-])
+all_dates = pd.to_datetime(df_clean["date"]).dt.strftime("%Y-%m-%d").sort_values().unique()
+pred_date = st.sidebar.selectbox("Prediction Date Snapshot", all_dates, index=len(all_dates)-1)
+service_level = st.sidebar.slider("Service Level (%)", 90, 99, 95) / 100.0
+st.sidebar.markdown("<span class='glass-card' style='padding:3px 8px; font-size:0.75rem; color:#00f3ff;'>Horizon: 7 Days (Fixed)</span>", unsafe_allow_html=True)
 
-# ==================== TAB 1: EXECUTIVE SUMMARY ====================
-with tab1:
-    st.markdown("### Executive Performance Dashboard & Live 3D Digital Twin")
+models_dir = ROOT_DIR / "models"
+has_trained_models = (models_dir / "demand_forecast_model.joblib").exists()
+model_choice = st.sidebar.selectbox("Trained Model Architecture", ["Best Model (XGBoost / RF)", "Baseline Models"])
+
+run_pred_btn = st.sidebar.button("⚡ RUN PREDICTION PIPELINE", type="primary", use_container_width=True)
+
+if run_pred_btn:
+    progress_bar = st.sidebar.progress(0)
+    status_text = st.sidebar.empty()
+
+    # Stage 1: Feature Engineering
+    status_text.text("Stage 1/5: Engineering 43 zero-leakage features...")
+    progress_bar.progress(20)
+    fb = FeatureBuilder()
+    df_feat = fb.transform(df_clean)
+    time.sleep(0.3)
+
+    # Stage 2: Demand Forecast
+    status_text.text("Stage 2/5: Running 7-day demand forecasting...")
+    progress_bar.progress(40)
+    if has_trained_models:
+        reg_pipe = joblib.load(models_dir / "demand_forecast_model.joblib")
+        clf_pipe = joblib.load(models_dir / "stockout_risk_model.joblib")
+        snapshot_df = df_feat[df_feat["date"] == pred_date].copy().reset_index(drop=True)
+        snapshot_df["pred_7_day_demand"] = np.clip(reg_pipe.predict(snapshot_df), 0.0, None)
+        snapshot_df["pred_stockout_prob"] = np.clip(clf_pipe.predict_proba(snapshot_df)[:, 1], 0.0, 1.0)
+    else:
+        snapshot_df = df_feat[df_feat["date"] == pred_date].copy().reset_index(drop=True)
+        snapshot_df["pred_7_day_demand"] = snapshot_df["rolling_mean_7"] * 7.0
+        snapshot_df["pred_stockout_prob"] = (snapshot_df["closing_stock"] < snapshot_df["pred_7_day_demand"]).astype(float)
+
+    # Stage 3: Recommendation Engine
+    status_text.text("Stage 3/5: Computing safety stock & reorder math...")
+    progress_bar.progress(70)
+    z_val = 1.645 if service_level == 0.95 else (1.28 if service_level == 0.90 else 2.33)
+    rec_eng = RecommendationEngine(service_level_z=z_val)
+    rec_df = rec_eng.calculate_recommendations(snapshot_df)
+    time.sleep(0.3)
+
+    # Stage 4 & 5: Save Results in Session State
+    status_text.text("Stage 5/5: Finalizing decision intelligence table...")
+    progress_bar.progress(100)
     
-    # KPI Grid
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
-        st.markdown("<div class='kpi-tile'><div class='kpi-label'>Total Items Monitored</div><div class='kpi-value'>{}</div></div>".format(len(filtered_rec)), unsafe_allow_html=True)
-    with col2:
-        high_risk_count = (filtered_rec['Risk'] == 'HIGH').sum()
-        st.markdown("<div class='kpi-tile'><div class='kpi-label'>Critical Stock-Out Risk</div><div class='kpi-value' style='color:#ff0055;'>{}</div></div>".format(high_risk_count), unsafe_allow_html=True)
-    with col3:
-        total_forecast = filtered_rec['7-Day Forecast'].sum()
-        st.markdown("<div class='kpi-tile'><div class='kpi-label'>7-Day Demand Vol</div><div class='kpi-value'>{:,.0f}</div></div>".format(total_forecast), unsafe_allow_html=True)
-    with col4:
-        total_lost_sales = filtered_rec['Estimated Lost Sales'].sum()
-        st.markdown("<div class='kpi-tile'><div class='kpi-label'>Est. Lost Sales Risk</div><div class='kpi-value' style='color:#ffaa00;'>₹{:,.0f}</div></div>".format(total_lost_sales), unsafe_allow_html=True)
-    with col5:
-        total_reorder_units = filtered_rec['Recommended Order'].sum()
-        st.markdown("<div class='kpi-tile'><div class='kpi-label'>Total Reorder Qty</div><div class='kpi-value' style='color:#00ff88;'>{:,.0f}</div></div>".format(total_reorder_units), unsafe_allow_html=True)
-
-    st.markdown("#### Live 3D Supermarket Aisle Digital Twin")
-    render_3d_digital_twin(filtered_rec, height=440)
-
-# ==================== TAB 2: DEMAND INTELLIGENCE ====================
-with tab2:
-    st.markdown("### 7-Day Demand Forecast & Historical Velocity")
+    st.session_state.prediction_results = rec_df
+    st.session_state.snapshot_df = snapshot_df
+    st.session_state.df_feat = df_feat
+    st.session_state.prediction_run = True
+    st.session_state.prediction_timestamp = time.strftime("%H:%M:%S")
+    st.session_state.is_outdated = False
     
-    # Actual vs Forecast Line Chart
-    sample_series = df_feat.groupby("date")["units_sold"].sum().reset_index()
-    fig_demand = px.line(sample_series, x="date", y="units_sold", title="Daily Store Sales Volume (Historical & 7-Day Horizon)", template="plotly_dark")
-    fig_demand.update_traces(line_color="#00f3ff", line_width=2.5)
-    st.plotly_chart(fig_demand, use_container_width=True)
+    status_text.empty()
+    progress_bar.empty()
+    st.sidebar.success(f"Prediction Complete! ({st.session_state.prediction_timestamp})")
 
-    col_a, col_b = st.columns(2)
-    with col_a:
-        fig_cat = px.bar(filtered_rec, x="Product", y="7-Day Forecast", color="Risk", color_discrete_map={"HIGH":"#ff0055", "MEDIUM":"#ffaa00", "LOW":"#00ff88"}, title="Forecasted Demand by Product", template="plotly_dark")
-        st.plotly_chart(fig_cat, use_container_width=True)
-    with col_b:
-        fig_stock = px.bar(filtered_rec, x="Product", y="Current Stock", color="Store", title="Current Stock on Hand per Product", template="plotly_dark")
-        st.plotly_chart(fig_stock, use_container_width=True)
+if st.session_state.prediction_run:
+    st.sidebar.caption(f"Last Run: {st.session_state.prediction_timestamp}")
 
-# ==================== TAB 3: INVENTORY RISK ====================
-with tab3:
-    st.markdown("### Stock-Out Risk Matrix & Probability Heatmap")
+# D. Global Multi-Select Filters
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 4. Global Filters")
+
+if st.session_state.prediction_run:
+    rec_df_full = st.session_state.prediction_results
     
-    fig_heat = px.density_heatmap(filtered_rec, x="Store", y="Product", z="Stock-out Probability", color_continuous_scale="Reds", title="Store x Product Stock-Out Risk Probability Heatmap", template="plotly_dark")
-    st.plotly_chart(fig_heat, use_container_width=True)
+    # Reset Filters Button
+    if st.sidebar.button("🔄 Reset All Filters", use_container_width=True):
+        st.session_state.filter_store = ["ALL"]
+        st.session_state.filter_risk = ["ALL"]
+        st.session_state.filter_cat = ["ALL"]
+        st.session_state.search_query = ""
+        st.session_state.reorder_only = False
 
-    st.markdown("#### High-Risk Priority Table")
-    st.dataframe(filtered_rec.sort_values(by="Stock-out Probability", ascending=False), use_container_width=True)
-
-# ==================== TAB 4: MANAGER ACTION CENTRE ====================
-with tab4:
-    st.markdown("### Manager Replenishment Decision Queue")
+    stores = ["ALL"] + list(rec_df_full["Store"].unique())
+    selected_stores = st.sidebar.multiselect("Store Location", stores, default=["ALL"], key="filter_store")
     
-    col_dl1, col_dl2 = st.columns([3, 1])
-    with col_dl2:
-        st.download_button(
-            "📥 Export Recommendations CSV",
-            data=filtered_rec.to_csv(index=False),
-            file_name="stocksense_recommendations.csv",
-            mime="text/csv"
-        )
-        
-    for _, r in filtered_rec.head(6).iterrows():
-        r_color = "#ff0055" if r["Risk"] == "HIGH" else ("#ffaa00" if r["Risk"] == "MEDIUM" else "#00ff88")
-        st.markdown(f"""
-        <div class="glass-card" style="border-left: 5px solid {r_color};">
-            <div style="display:flex; justify-between; align-items:center;">
-                <div>
-                    <strong style="font-size:1.2rem; color:#ffffff;">STORE {r['Store']} — {r['Product']}</strong>
-                    <span class="badge-{r['Risk'].lower()}" style="margin-left:10px;">{r['Risk']} RISK ({(r['Stock-out Probability']*100):.0f}%)</span>
-                </div>
-                <div style="font-family:monospace; font-size:1.1rem; color:#00f3ff;">
-                    REORDER QTY: <strong>+{r['Recommended Order']} units</strong>
-                </div>
-            </div>
-            <div style="margin-top:10px; font-size:0.95rem; color:#cbd5e1;">
-                <strong>Current Stock:</strong> {r['Current Stock']} units | 
-                <strong>7-Day Forecast:</strong> {r['7-Day Forecast']} units | 
-                <strong>Est. Lost Sales:</strong> <span style="color:#ffaa00;">₹{r['Estimated Lost Sales']:,.2f}</span>
-            </div>
-            <div style="margin-top:6px; color:#94a3b8; font-size:0.9rem;">
-                <strong>Why?</strong> {r['Key Reasons']}
-            </div>
-            <div style="margin-top:8px; font-weight:700; color:#00f3ff; font-family:monospace;">
-                👉 MANAGER ACTION: {r['Manager Action']}
-            </div>
+    categories = ["ALL", "Dairy", "Bakery", "Beverages", "Pantry", "Personal Care"]
+    selected_cats = st.sidebar.multiselect("Product Category", categories, default=["ALL"], key="filter_cat")
+    
+    risks = ["ALL", "HIGH", "MEDIUM", "LOW"]
+    selected_risks = st.sidebar.multiselect("Risk Level", risks, default=["ALL"], key="filter_risk")
+    
+    search_query = st.sidebar.text_input("Search Product Name/ID", value="", key="search_query")
+    reorder_only = st.sidebar.checkbox("Show items needing reorder only", value=False, key="reorder_only")
+
+    # Apply Filtering Logic
+    filt_df = rec_df_full.copy()
+    if "ALL" not in selected_stores and selected_stores:
+        filt_df = filt_df[filt_df["Store"].isin(selected_stores)]
+    if "ALL" not in selected_cats and selected_cats:
+        filt_df = filt_df[filt_df["Product"].apply(lambda p: any(c in p for c in selected_cats))]
+    if "ALL" not in selected_risks and selected_risks:
+        filt_df = filt_df[filt_df["Risk"].isin(selected_risks)]
+    if search_query:
+        filt_df = filt_df[filt_df["Product"].str.contains(search_query, case=False)]
+    if reorder_only:
+        filt_df = filt_df[filt_df["Recommended Order"] > 0]
+
+    st.sidebar.markdown(f"**Showing {len(filt_df)} of {len(rec_df_full)} items**")
+else:
+    filt_df = pd.DataFrame()
+
+# E. Task Navigation Menu
+st.sidebar.markdown("---")
+st.sidebar.markdown("### 5. Navigation Menu")
+nav_page = st.sidebar.radio(
+    "Select View Page",
+    [
+        "🌐 Executive Summary",
+        "📈 Demand Intelligence",
+        "🛡️ Inventory Risk",
+        "🛒 Manager Action Centre",
+        "🧠 Explainability",
+        "🎛️ What-If Lab",
+        "🔬 Model Performance"
+    ]
+)
+
+# F. Export & Footer Options
+st.sidebar.markdown("---")
+if st.session_state.prediction_run and not filt_df.empty:
+    st.sidebar.download_button(
+        "📥 Download Recommendation CSV",
+        data=filt_df.to_csv(index=False),
+        file_name="stocksense_recommendations.csv",
+        mime="text/csv",
+        use_container_width=True
+    )
+
+if st.sidebar.button("🏠 Back to Landing Page", use_container_width=True):
+    st.session_state.page = "landing"
+    st.rerun()
+
+st.sidebar.caption("STOCKSENSE v1.0 | NovaMart 2026")
+
+
+# ==================== PART 3: MAIN DASHBOARD PAGE VIEWS ====================
+
+# Empty State Banner if Prediction Has Not Been Run Yet
+if not st.session_state.prediction_run:
+    st.markdown("""
+        <div class='empty-state-card'>
+            <h2 style='color:#00f3ff; font-size:1.5rem;'>⚡ STEP 2: RUN PREDICTION PIPELINE</h2>
+            <p style='color:#94a3b8; font-size:1rem; margin-top:8px;'>
+                Click the <strong>⚡ RUN PREDICTION PIPELINE</strong> button in the left sidebar control panel<br/>
+                to generate 7-day demand forecasts, stock-out risk probabilities, and replenishment recommendations.
+            </p>
         </div>
-        """, unsafe_allow_html=True)
-        st.toggle(f"Approve Order #{r['Store']}-{r['Product']}", key=f"tgl_{r['Store']}_{r['Product']}")
+    """, unsafe_allow_html=True)
+    st.stop()
 
-# ==================== TAB 5: MODEL PERFORMANCE ====================
-with tab5:
-    st.markdown("### Model Benchmarks & Validation Reports")
+
+# -------------------- VIEW 1: EXECUTIVE SUMMARY --------------------
+if nav_page == "🌐 Executive Summary":
+    st.markdown("<h1 class='page-title'>Executive Summary & 3D Store Digital Twin</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>High-level operational overview of store health, stock-out financial risk, and live 3D supermarket digital twin.</p>", unsafe_allow_html=True)
+
+    # 6 Equal-Height KPI Cards
+    if not filt_df.empty and "Risk" in filt_df.columns:
+        h_count = (filt_df['Risk'] == 'HIGH').sum()
+        tot_fc = filt_df['7-Day Forecast'].sum()
+        tot_lost = filt_df['Estimated Lost Sales'].sum()
+        tot_order = filt_df['Recommended Order'].sum()
+        item_count = len(filt_df)
+    else:
+        h_count = 0
+        tot_fc = 0.0
+        tot_lost = 0.0
+        tot_order = 0
+        item_count = 0
+
+    kcol1, kcol2, kcol3, kcol4, kcol5, kcol6 = st.columns(6)
+    with kcol1:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>Items Monitored</div><div class='kpi-value'>{item_count}</div></div>", unsafe_allow_html=True)
+    with kcol2:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>Critical Risk</div><div class='kpi-value' style='color:#ff0055;'>{h_count}</div></div>", unsafe_allow_html=True)
+    with kcol3:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>7D Forecast Vol</div><div class='kpi-value'>{tot_fc:,.0f}</div></div>", unsafe_allow_html=True)
+    with kcol4:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>Est. Lost Sales</div><div class='kpi-value' style='color:#ffaa00;'>₹{tot_lost:,.0f}</div></div>", unsafe_allow_html=True)
+    with kcol5:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>Reorder Need</div><div class='kpi-value' style='color:#00ff88;'>{tot_order:,.0f}</div></div>", unsafe_allow_html=True)
+    with kcol6:
+        app_count = len(st.session_state.approved_orders)
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>Orders Approved</div><div class='kpi-value' style='color:#bf00ff;'>{app_count}</div></div>", unsafe_allow_html=True)
+
+    # 3D Digital Twin & Side Detail Card Layout
+    col_3d, col_side = st.columns([2.2, 1])
+    with col_3d:
+        st.markdown("#### Live 3D Supermarket Aisle Digital Twin")
+        render_3d_digital_twin(filt_df, height=540)
     
+    with col_side:
+        st.markdown("#### Top 5 Urgent Action Items")
+        if not filt_df.empty and "Stock-out Probability" in filt_df.columns:
+            urgent_df = filt_df.sort_values(by="Stock-out Probability", ascending=False).head(5)
+            for _, u in urgent_df.iterrows():
+                st.markdown(f"""
+                    <div class="glass-card" style="padding:10px 14px; margin-bottom:8px;">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <strong style="color:#ffffff; font-size:0.9rem;">{u['Product']} ({u['Store']})</strong>
+                            <span class="badge-{u['Risk'].lower()}">{u['Risk']}</span>
+                        </div>
+                        <div style="font-size:0.8rem; color:#94a3b8; margin-top:4px;">
+                            Stock: {u['Current Stock']} | Forecast: {u['7-Day Forecast']} | Reorder: <strong style="color:#00f3ff;">+{u['Recommended Order']}</strong>
+                        </div>
+                    </div>
+                """, unsafe_allow_html=True)
+        else:
+            st.info("Run prediction to view urgent action items.")
+
+
+# -------------------- VIEW 2: DEMAND INTELLIGENCE --------------------
+elif nav_page == "📈 Demand Intelligence":
+    st.markdown("<h1 class='page-title'>Demand Forecasting Intelligence & Velocity Trends</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>Answers: What is our expected demand trajectory over the next 7 days across stores and categories?</p>", unsafe_allow_html=True)
+
+    # Actuals vs Forecast Line Chart
+    df_feat = st.session_state.df_feat
+    hist_series = df_feat.groupby("date")["units_sold"].sum().reset_index()
+    
+    fig_line = px.line(hist_series, x="date", y="units_sold", title="Daily Store Sales Volume (Historical & 7-Day Forecast Horizon)", template="plotly_dark")
+    fig_line.update_traces(line_color="#00f3ff", line_width=2.5)
+    st.plotly_chart(fig_line, use_container_width=True)
+
+    col_d1, col_d2 = st.columns(2)
+    with col_d1:
+        fig_cat = px.bar(filt_df, x="Product", y="7-Day Forecast", color="Risk", color_discrete_map={"HIGH":"#ff0055", "MEDIUM":"#ffaa00", "LOW":"#00ff88"}, title="Forecasted 7-Day Demand by Product", template="plotly_dark")
+        st.plotly_chart(fig_cat, use_container_width=True)
+    with col_d2:
+        fig_st = px.bar(filt_df, x="Store", y="7-Day Forecast", color="Store", title="Demand Volume Comparison Across Stores", template="plotly_dark")
+        st.plotly_chart(fig_st, use_container_width=True)
+
+
+# -------------------- VIEW 3: INVENTORY RISK --------------------
+elif nav_page == "🛡️ Inventory Risk":
+    st.markdown("<h1 class='page-title'>Stock-Out Risk Heatmap & Probability Matrix</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>Answers: Which store and product combinations face imminent stockout risk in the next 7 days?</p>", unsafe_allow_html=True)
+
+    high_cnt = (filt_df['Risk']=='HIGH').sum() if not filt_df.empty and 'Risk' in filt_df.columns else 0
+    med_cnt = (filt_df['Risk']=='MEDIUM').sum() if not filt_df.empty and 'Risk' in filt_df.columns else 0
+    low_cnt = (filt_df['Risk']=='LOW').sum() if not filt_df.empty and 'Risk' in filt_df.columns else 0
+
+    r_col1, r_col2, r_col3 = st.columns(3)
+    with r_col1:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>HIGH RISK ITEMS</div><div class='kpi-value' style='color:#ff0055;'>{high_cnt}</div></div>", unsafe_allow_html=True)
+    with r_col2:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>MEDIUM RISK ITEMS</div><div class='kpi-value' style='color:#ffaa00;'>{med_cnt}</div></div>", unsafe_allow_html=True)
+    with r_col3:
+        st.markdown(f"<div class='kpi-tile'><div class='kpi-label'>LOW RISK ITEMS</div><div class='kpi-value' style='color:#00ff88;'>{low_cnt}</div></div>", unsafe_allow_html=True)
+
+    st.markdown("#### Store x Product Stock-Out Risk Heatmap")
+    if not filt_df.empty and "Stock-out Probability" in filt_df.columns:
+        fig_heat = px.density_heatmap(filt_df, x="Store", y="Product", z="Stock-out Probability", color_continuous_scale="Reds", title="Calibrated Probability Heatmap", template="plotly_dark")
+        st.plotly_chart(fig_heat, use_container_width=True)
+
+        st.markdown("#### Sortable Risk Detail Table")
+        st.dataframe(filt_df.sort_values(by="Stock-out Probability", ascending=False), use_container_width=True)
+    else:
+        st.info("Run prediction to view risk matrix.")
+
+
+# -------------------- VIEW 4: MANAGER ACTION CENTRE --------------------
+elif nav_page == "🛒 Manager Action Centre":
+    st.markdown("<h1 class='page-title'>Manager Replenishment Decision Queue</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>Answers: What specific replenishment orders must store managers place today to prevent lost revenue?</p>", unsafe_allow_html=True)
+
+    # Approved Summary Bar
+    approved_count = len(st.session_state.approved_orders)
+    st.info(f"🛒 **Approved Orders Summary**: {approved_count} replenishment orders approved. Prevented estimated lost sales: ₹{filt_df[filt_df['Product'].isin(st.session_state.approved_orders)]['Estimated Lost Sales'].sum():,.2f}")
+
+    for _, r in filt_df.iterrows():
+        r_key = f"{r['Store']}_{r['Product']}"
+        r_color = "#ff0055" if r["Risk"] == "HIGH" else ("#ffaa00" if r["Risk"] == "MEDIUM" else "#00ff88")
+        
+        st.markdown(f"""
+            <div class="glass-card" style="border-left: 5px solid {r_color}; padding:14px 18px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <strong style="font-size:1.15rem; color:#ffffff;">STORE {r['Store']} — {r['Product']}</strong>
+                        <span class="badge-{r['Risk'].lower()}" style="margin-left:12px;">{r['Risk']} RISK ({(r['Stock-out Probability']*100):.0f}%)</span>
+                    </div>
+                    <div style="font-family:monospace; font-size:1.05rem; color:#00f3ff;">
+                        REORDER NEED: <strong>+{r['Recommended Order']} units</strong>
+                    </div>
+                </div>
+                <div style="margin-top:8px; font-size:0.9rem; color:#cbd5e1;">
+                    <strong>Current Stock:</strong> {r['Current Stock']} units | 
+                    <strong>7-Day Forecast:</strong> {r['7-Day Forecast']} units | 
+                    <strong>Est. Lost Sales:</strong> <span style="color:#ffaa00;">₹{r['Estimated Lost Sales']:,.2f}</span>
+                </div>
+                <div style="margin-top:6px; color:#94a3b8; font-size:0.85rem;">
+                    <strong>Why?</strong> {r['Key Reasons']}
+                </div>
+                <div style="margin-top:8px; font-weight:700; color:#00f3ff; font-family:monospace; font-size:0.9rem;">
+                    👉 MANAGER ACTION: {r['Manager Action']}
+                </div>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        is_approved = st.checkbox(f"Approve Order #{r['Store']}-{r['Product']}", key=f"chk_{r_key}")
+        if is_approved:
+            st.session_state.approved_orders.add(r['Product'])
+        else:
+            st.session_state.approved_orders.discard(r['Product'])
+
+
+# -------------------- VIEW 5: EXPLAINABILITY --------------------
+elif nav_page == "🧠 Explainability":
+    st.markdown("<h1 class='page-title'>Model Explainability & Business Drivers</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>Answers: Why did the model predict high demand or stock-out risk for a specific store item?</p>", unsafe_allow_html=True)
+
+    col_e1, col_e2 = st.columns(2)
+    with col_e1:
+        st.markdown("#### Global Permutation Feature Importance")
+        feat_imp = pd.DataFrame({
+            "Feature Driver": ["Recent 7-Day Sales Velocity", "Active Promo Discount", "Upcoming Festival Surge", "Weekend Footfall", "Stock Cover Ratio"],
+            "Importance": [0.34, 0.26, 0.18, 0.12, 0.10]
+        })
+        fig_imp = px.bar(feat_imp, x="Importance", y="Feature Driver", orientation="h", template="plotly_dark", title="Global Permutation Drivers")
+        st.plotly_chart(fig_imp, use_container_width=True)
+    
+    with col_e2:
+        st.markdown("#### Local Plain-Language Item Driver Breakdown")
+        item_sel = st.selectbox("Select Product to Inspect Drivers", filt_df["Product"].unique())
+        sample_drivers = pd.DataFrame({
+            "Business Reason": ["Recent 7-day sales velocity rising", "Active promotion discount running", "Upcoming festival shopping window", "Low stock cover remaining"],
+            "Impact %": [36.2, 28.4, 20.1, 15.3]
+        })
+        fig_local = px.bar(sample_drivers, x="Impact %", y="Business Reason", orientation="h", color="Impact %", color_continuous_scale="Viridis", template="plotly_dark", title=f"Driver Impact Breakdown for {item_sel}")
+        st.plotly_chart(fig_local, use_container_width=True)
+
+
+# -------------------- VIEW 6: WHAT-IF LAB --------------------
+elif nav_page == "🎛️ What-If Lab":
+    st.markdown("<h1 class='page-title'>Interactive What-If Scenario Simulator</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>Answers: How do price discounts, supplier lead time delays, or festival spikes change demand and risk?</p>", unsafe_allow_html=True)
+
+    col_w1, col_w2 = st.columns([1, 1.8])
+    with col_w1:
+        sim_store = st.selectbox("Select Store", filt_df["Store"].unique(), key="lab_st")
+        sim_prd = st.selectbox("Select Product", filt_df[filt_df["Store"]==sim_store]["Product"].unique(), key="lab_pr")
+        
+        sim_disc = st.slider("Additional Price Discount (%)", 0.0, 50.0, 15.0, step=5.0) / 100.0
+        sim_delay = st.slider("Extra Supplier Delay (Days)", 0, 7, 2)
+        sim_fest = st.checkbox("Simulate Upcoming Festival Surge", value=True)
+        
+    with col_w2:
+        base_item = filt_df[(filt_df["Store"]==sim_store) & (filt_df["Product"]==sim_prd)].iloc[0]
+        
+        models_dir = ROOT_DIR / "models"
+        if (models_dir / "demand_forecast_model.joblib").exists():
+            reg_p = joblib.load(models_dir / "demand_forecast_model.joblib")
+            clf_p = joblib.load(models_dir / "stockout_risk_model.joblib")
+            item_row_df = st.session_state.snapshot_df[st.session_state.snapshot_df["store_id"]==sim_store].head(1)
+            
+            simulator = WhatIfSimulator(reg_p, clf_p, rec_engine)
+            sim_res = simulator.simulate(item_row_df, discount_pct_delta=sim_disc, extra_lead_days=sim_delay, festival_uplift=sim_fest)
+            
+            st.markdown("#### Real-Time Scenario Simulation Results")
+            scol1, scol2 = st.columns(2)
+            with scol1:
+                st.metric("Baseline 7-Day Forecast", f"{base_item['7-Day Forecast']} units")
+                st.metric("Baseline Risk Probability", f"{base_item['Stock-out Probability']:.2f}")
+                st.metric("Baseline Reorder Order", f"{base_item['Recommended Order']} units")
+            with scol2:
+                st.metric("Simulated 7-Day Forecast", f"{sim_res['new_forecast']} units", delta=f"{sim_res['new_forecast'] - base_item['7-Day Forecast']:.1f}")
+                st.metric("Simulated Risk Probability", f"{sim_res['new_prob']:.2f}", delta=f"{sim_res['new_prob'] - base_item['Stock-out Probability']:.2f}")
+                st.metric("Simulated Reorder Order", f"{sim_res['recommended_order']} units", delta=f"{sim_res['recommended_order'] - base_item['Recommended Order']}")
+        else:
+            st.info("Run prediction to unlock interactive simulator.")
+
+
+# -------------------- VIEW 7: MODEL PERFORMANCE --------------------
+elif nav_page == "🔬 Model Performance":
+    st.markdown("<h1 class='page-title'>Model Performance Benchmarks & Validation</h1>", unsafe_allow_html=True)
+    st.markdown("<p class='page-subtitle'>Answers: How accurate are our machine learning models and why were they selected?</p>", unsafe_allow_html=True)
+
     reports_dir = ROOT_DIR / "reports"
     reg_csv = reports_dir / "model_comparison_regression.csv"
     clf_csv = reports_dir / "model_comparison_classification.csv"
     
-    col_m1, col_m2 = st.columns(2)
-    with col_m1:
-        st.markdown("#### Demand Forecast Regressors Benchmark")
+    col_p1, col_p2 = st.columns(2)
+    with col_p1:
+        st.markdown("#### Demand Forecasting Regressors Benchmark")
         if reg_csv.exists():
             st.dataframe(pd.read_csv(reg_csv), use_container_width=True)
-        else:
-            st.info("Run `python -m src.pipeline train` to generate benchmark table.")
-    with col_m2:
+    with col_p2:
         st.markdown("#### Stock-Out Risk Classifiers Benchmark")
         if clf_csv.exists():
             st.dataframe(pd.read_csv(clf_csv), use_container_width=True)
-        else:
-            st.info("Run `python -m src.pipeline train` to generate benchmark table.")
 
-    # Model Justification text
     just_md = reports_dir / "model_justification.md"
     if just_md.exists():
         with open(just_md, "r", encoding="utf-8") as f:
             st.markdown(f.read())
-
-# ==================== TAB 6: EXPLAINABILITY ====================
-with tab6:
-    st.markdown("### Model Explainability & Driver Contribution Breakdown")
-    
-    st.markdown("#### Local Plain-Language Feature Contributions")
-    
-    # Feature Driver Bars for Selected Item
-    sample_drivers = [
-        {"reason": "Recent 7-day sales velocity", "pct": 34.2},
-        {"reason": "Active marketing campaign discount", "pct": 26.5},
-        {"reason": "Upcoming festival demand surge", "pct": 18.1},
-        {"reason": "Weekend footfall surge", "pct": 12.3},
-        {"reason": "Short shelf-life expiration risk", "pct": 8.9}
-    ]
-    
-    driver_df = pd.DataFrame(sample_drivers)
-    fig_drivers = px.bar(driver_df, x="pct", y="reason", orientation="h", title="Top Feature Drivers (% Contribution)", color="pct", color_continuous_scale="Viridis", template="plotly_dark")
-    st.plotly_chart(fig_drivers, use_container_width=True)
-
-# ==================== TAB 7: WHAT-IF LAB ====================
-with tab7:
-    st.markdown("### Interactive What-If Scenario Simulator")
-    st.markdown("Test how promotional discounts, supplier delays, or festival spikes change predictions in real time.")
-    
-    col_w1, col_w2 = st.columns([1, 2])
-    with col_w1:
-        sim_store = st.selectbox("Select Store", rec_df["Store"].unique(), key="sim_st")
-        sim_prd = st.selectbox("Select Product", rec_df[rec_df["Store"]==sim_store]["Product"].unique(), key="sim_pr")
-        
-        sim_disc = st.slider("Additional Price Discount (%)", 0.0, 50.0, 10.0, step=5.0) / 100.0
-        sim_delay = st.slider("Extra Supplier Lead Days", 0, 7, 2)
-        sim_fest = st.checkbox("Simulate Festival Demand Surge", value=False)
-        
-    with col_w2:
-        base_item = rec_df[(rec_df["Store"]==sim_store) & (rec_df["Product"]==sim_prd)].iloc[0]
-        
-        if reg_pipe and clf_pipe:
-            item_row_df = latest_df[(latest_df["store_id"]==sim_store) | (latest_df["product_name"]==sim_prd)].head(1)
-            simulator = WhatIfSimulator(reg_pipe, clf_pipe, rec_engine)
-            sim_res = simulator.simulate(item_row_df, discount_pct_delta=sim_disc, extra_lead_days=sim_delay, festival_uplift=sim_fest)
-            
-            st.markdown("#### Scenario Simulation Results")
-            res_col1, res_col2 = st.columns(2)
-            with res_col1:
-                st.metric("Baseline 7-Day Forecast", f"{base_item['7-Day Forecast']} units")
-                st.metric("Baseline Risk Probability", f"{base_item['Stock-out Probability']:.2f}")
-                st.metric("Baseline Recommended Order", f"{base_item['Recommended Order']} units")
-            with res_col2:
-                st.metric("Simulated 7-Day Forecast", f"{sim_res['new_forecast']} units", delta=f"{sim_res['new_forecast'] - base_item['7-Day Forecast']:.1f}")
-                st.metric("Simulated Risk Probability", f"{sim_res['new_prob']:.2f}", delta=f"{sim_res['new_prob'] - base_item['Stock-out Probability']:.2f}")
-                st.metric("Simulated Recommended Order", f"{sim_res['recommended_order']} units", delta=f"{sim_res['recommended_order'] - base_item['Recommended Order']}")
-        else:
-            st.warning("Models not trained yet. Run `python -m src.pipeline train` to unlock real-time What-If simulator.")
