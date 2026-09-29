@@ -118,6 +118,7 @@ class RecommendationEngine:
             rec_row = {
                 "Store": store,
                 "Product": prd_name,
+                "Category": category,
                 "Current Stock": int(round(curr_stock)),
                 "7-Day Forecast": int(round(forecast_7d)),
                 "Stock-out Probability": round(prob_stockout, 3),

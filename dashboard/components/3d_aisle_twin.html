@@ -249,6 +249,7 @@
                     beacon: beaconMesh,
                     data: item,
                     baseHeight: heightRatio,
+                    centerY: yPos + heightRatio / 2,
                     originalStock: item.stock
                 });
             });
@@ -299,7 +300,10 @@
                 itemCrates.forEach(c => {
                     const drained = Math.max(0, c.originalStock - Math.round((c.data.forecast / 7.0) * day));
                     const newHeight = Math.max(0.2, (drained / (c.data.forecast + 1e-5)) * 2.2);
-                    c.mesh.scale.y = newHeight / c.baseHeight;
+                    const scaleFactor = newHeight / c.baseHeight;
+                    c.mesh.scale.y = scaleFactor;
+                    const shelfBottom = c.centerY - c.baseHeight / 2;
+                    c.mesh.position.y = shelfBottom + newHeight / 2;
                 });
                 document.getElementById('status-text').innerText = `Simulating 7-Day Demand Drain... Day ${day}/7`;
                 if (day >= 7) {
@@ -313,6 +317,7 @@
         function animateOrderRefill() {
             itemCrates.forEach(c => {
                 c.mesh.scale.y = 1.0;
+                c.mesh.position.y = c.centerY;
             });
             document.getElementById('status-text').innerText = `Recommended replenishment applied! Shelves refilled.`;
         }
