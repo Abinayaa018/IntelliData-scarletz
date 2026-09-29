@@ -46,8 +46,8 @@ if CSS_PATH.exists():
         st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
 
 # 3. Session State Initialization
-if "page" not in st.session_state:
-    st.session_state.page = "landing"
+if "nav_page" not in st.session_state:
+    st.session_state.nav_page = "🏠 Home / Landing Page"
 if "prediction_run" not in st.session_state:
     st.session_state.prediction_run = False
 if "prediction_timestamp" not in st.session_state:
@@ -80,46 +80,12 @@ def load_raw_dataset(source_type: str = "demo", uploaded_file=None):
         df_clean, summary = val.validate(df_raw)
         return df_clean, True, summary
 
-# ==================== PART 1: LANDING PAGE ====================
-if st.session_state.page == "landing":
-    st.markdown("""
-        <div style='text-align: center; margin-top: 10px; margin-bottom: 8px;'>
-            <h1 style='font-size: 2.2rem; margin-bottom: 2px; background: linear-gradient(90deg, #00f3ff, #bf00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
-                ⚡ STOCKSENSE
-            </h1>
-            <p style='font-size: 1.05rem; color: #cbd5e1; font-weight: 500;'>
-                Predict demand. Prevent stock-outs. Power better decisions.
-            </p>
-        </div>
-    """, unsafe_allow_html=True)
 
-    # Render Cinematic 3D Hero Animation
-    render_landing_3d_hero(height=420)
-
-    # Primary Enter Button & Feature Chips
-    col_btn1, col_btn2, col_btn3 = st.columns([1, 1.2, 1])
-    with col_btn2:
-        if st.button("🚀 ENTER COMMAND CENTRE", use_container_width=True, type="primary"):
-            st.session_state.page = "dashboard"
-            st.rerun()
-
-    st.markdown("""
-        <div style='display: flex; justify-content: center; gap: 16px; margin-top: 18px;'>
-            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #00f3ff;'>📈 7-Day Demand Forecast</span>
-            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #ff0055;'>🛡️ Stock-Out Risk Alerts</span>
-            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #00ff88;'>📦 Smart Reorder Actions</span>
-        </div>
-        <p style='text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 24px;'>
-            NovaMart Retail | IntelliData 2026 Hackathon Platform
-        </p>
-    """, unsafe_allow_html=True)
-    st.stop()
-
-# ==================== PART 2: DASHBOARD MODE & SIDEBAR CONTROL PANEL ====================
+# ==================== SIDEBAR CONTROL PANEL (ALWAYS RENDERED) ====================
 st.sidebar.markdown("<h2 style='color:#00f3ff; margin-bottom:0;'>⚡ STOCKSENSE</h2>", unsafe_allow_html=True)
 st.sidebar.markdown("<p style='font-size:0.78rem; color:#94a3b8; margin-top:0;'>Command Centre v1.0</p>", unsafe_allow_html=True)
 
-# A. Data Source Selector
+# 1. Data Source Selector
 st.sidebar.markdown("### 1. Data Source")
 data_source = st.sidebar.radio("Select Input Data", ["Use demo data", "Upload master_table.csv"], key="data_src_radio")
 
@@ -141,7 +107,7 @@ if is_demo_data:
 
 st.sidebar.caption(f"Loaded: {len(df_clean):,} rows | {df_clean['store_id'].nunique()} stores | {df_clean['product_id'].nunique()} products")
 
-# B. Guided Stepper
+# 2. Guided Stepper
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 2. Guided Progress Stepper")
 step1_done = True
@@ -158,7 +124,7 @@ st.sidebar.markdown(f"""
     </div>
 """, unsafe_allow_html=True)
 
-# C. Prediction Pipeline Controls
+# 3. Prediction Pipeline Controls
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 3. Prediction Execution")
 
@@ -224,7 +190,7 @@ if run_pred_btn:
 if st.session_state.prediction_run:
     st.sidebar.caption(f"Last Run: {st.session_state.prediction_timestamp}")
 
-# D. Global Multi-Select Filters
+# 4. Global Multi-Select Filters
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 4. Global Filters")
 
@@ -268,23 +234,27 @@ if st.session_state.prediction_run:
 else:
     filt_df = pd.DataFrame()
 
-# E. Task Navigation Menu
+# 5. Navigation Menu
 st.sidebar.markdown("---")
 st.sidebar.markdown("### 5. Navigation Menu")
-nav_page = st.sidebar.radio(
-    "Select View Page",
-    [
-        "🌐 Executive Summary",
-        "📈 Demand Intelligence",
-        "🛡️ Inventory Risk",
-        "🛒 Manager Action Centre",
-        "🧠 Explainability",
-        "🎛️ What-If Lab",
-        "🔬 Model Performance"
-    ]
-)
 
-# F. Export & Footer Options
+pages = [
+    "🏠 Home / Landing Page",
+    "🌐 Executive Summary",
+    "📈 Demand Intelligence",
+    "🛡️ Inventory Risk",
+    "🛒 Manager Action Centre",
+    "🧠 Explainability",
+    "🎛️ What-If Lab",
+    "🔬 Model Performance"
+]
+
+current_nav_index = pages.index(st.session_state.nav_page) if st.session_state.nav_page in pages else 0
+
+selected_nav = st.sidebar.radio("Select View Page", pages, index=current_nav_index, key="nav_radio_menu")
+st.session_state.nav_page = selected_nav
+
+# 6. Export Options
 st.sidebar.markdown("---")
 if st.session_state.prediction_run and not filt_df.empty:
     st.sidebar.download_button(
@@ -295,16 +265,48 @@ if st.session_state.prediction_run and not filt_df.empty:
         use_container_width=True
     )
 
-if st.sidebar.button("🏠 Back to Landing Page", use_container_width=True):
-    st.session_state.page = "landing"
-    st.rerun()
-
 st.sidebar.caption("STOCKSENSE v1.0 | NovaMart 2026")
 
 
-# ==================== PART 3: MAIN DASHBOARD PAGE VIEWS ====================
+# ==================== MAIN AREA ROUTER ====================
 
-# Empty State Banner if Prediction Has Not Been Run Yet
+# -------------------- VIEW 0: HOME / LANDING PAGE --------------------
+if st.session_state.nav_page == "🏠 Home / Landing Page":
+    st.markdown("""
+        <div style='text-align: center; margin-top: 5px; margin-bottom: 8px;'>
+            <h1 style='font-size: 2.2rem; margin-bottom: 2px; background: linear-gradient(90deg, #00f3ff, #bf00ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;'>
+                ⚡ STOCKSENSE
+            </h1>
+            <p style='font-size: 1.05rem; color: #cbd5e1; font-weight: 500;'>
+                Predict demand. Prevent stock-outs. Power better decisions.
+            </p>
+        </div>
+    """, unsafe_allow_html=True)
+
+    # Render Cinematic 3D Hero Animation
+    render_landing_3d_hero(height=420)
+
+    # Primary Enter Button & Feature Chips
+    col_btn1, col_btn2, col_btn3 = st.columns([1, 1.2, 1])
+    with col_btn2:
+        if st.button("🚀 ENTER COMMAND CENTRE", use_container_width=True, type="primary"):
+            st.session_state.nav_page = "🌐 Executive Summary"
+            st.rerun()
+
+    st.markdown("""
+        <div style='display: flex; justify-content: center; gap: 16px; margin-top: 18px;'>
+            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #00f3ff;'>📈 7-Day Demand Forecast</span>
+            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #ff0055;'>🛡️ Stock-Out Risk Alerts</span>
+            <span class='glass-card' style='padding: 6px 16px; font-size: 0.85rem; color: #00ff88;'>📦 Smart Reorder Actions</span>
+        </div>
+        <p style='text-align: center; color: #64748b; font-size: 0.8rem; margin-top: 24px;'>
+            NovaMart Retail | IntelliData 2026 Hackathon Platform
+        </p>
+    """, unsafe_allow_html=True)
+    st.stop()
+
+
+# For all downstream dashboard pages, check if prediction pipeline has been executed
 if not st.session_state.prediction_run:
     st.markdown("""
         <div class='empty-state-card'>
@@ -319,7 +321,7 @@ if not st.session_state.prediction_run:
 
 
 # -------------------- VIEW 1: EXECUTIVE SUMMARY --------------------
-if nav_page == "🌐 Executive Summary":
+if st.session_state.nav_page == "🌐 Executive Summary":
     st.markdown("<h1 class='page-title'>Executive Summary & 3D Store Digital Twin</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>High-level operational overview of store health, stock-out financial risk, and live 3D supermarket digital twin.</p>", unsafe_allow_html=True)
 
@@ -379,7 +381,7 @@ if nav_page == "🌐 Executive Summary":
 
 
 # -------------------- VIEW 2: DEMAND INTELLIGENCE --------------------
-elif nav_page == "📈 Demand Intelligence":
+elif st.session_state.nav_page == "📈 Demand Intelligence":
     st.markdown("<h1 class='page-title'>Demand Forecasting Intelligence & Velocity Trends</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>Answers: What is our expected demand trajectory over the next 7 days across stores and categories?</p>", unsafe_allow_html=True)
 
@@ -401,7 +403,7 @@ elif nav_page == "📈 Demand Intelligence":
 
 
 # -------------------- VIEW 3: INVENTORY RISK --------------------
-elif nav_page == "🛡️ Inventory Risk":
+elif st.session_state.nav_page == "🛡️ Inventory Risk":
     st.markdown("<h1 class='page-title'>Stock-Out Risk Heatmap & Probability Matrix</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>Answers: Which store and product combinations face imminent stockout risk in the next 7 days?</p>", unsafe_allow_html=True)
 
@@ -429,7 +431,7 @@ elif nav_page == "🛡️ Inventory Risk":
 
 
 # -------------------- VIEW 4: MANAGER ACTION CENTRE --------------------
-elif nav_page == "🛒 Manager Action Centre":
+elif st.session_state.nav_page == "🛒 Manager Action Centre":
     st.markdown("<h1 class='page-title'>Manager Replenishment Decision Queue</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>Answers: What specific replenishment orders must store managers place today to prevent lost revenue?</p>", unsafe_allow_html=True)
 
@@ -474,7 +476,7 @@ elif nav_page == "🛒 Manager Action Centre":
 
 
 # -------------------- VIEW 5: EXPLAINABILITY --------------------
-elif nav_page == "🧠 Explainability":
+elif st.session_state.nav_page == "🧠 Explainability":
     st.markdown("<h1 class='page-title'>Model Explainability & Business Drivers</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>Answers: Why did the model predict high demand or stock-out risk for a specific store item?</p>", unsafe_allow_html=True)
 
@@ -490,7 +492,7 @@ elif nav_page == "🧠 Explainability":
     
     with col_e2:
         st.markdown("#### Local Plain-Language Item Driver Breakdown")
-        item_sel = st.selectbox("Select Product to Inspect Drivers", filt_df["Product"].unique())
+        item_sel = st.selectbox("Select Product to Inspect Drivers", filt_df["Product"].unique() if not filt_df.empty else ["Fresh Milk 1L"])
         sample_drivers = pd.DataFrame({
             "Business Reason": ["Recent 7-day sales velocity rising", "Active promotion discount running", "Upcoming festival shopping window", "Low stock cover remaining"],
             "Impact %": [36.2, 28.4, 20.1, 15.3]
@@ -500,29 +502,29 @@ elif nav_page == "🧠 Explainability":
 
 
 # -------------------- VIEW 6: WHAT-IF LAB --------------------
-elif nav_page == "🎛️ What-If Lab":
+elif st.session_state.nav_page == "🎛️ What-If Lab":
     st.markdown("<h1 class='page-title'>Interactive What-If Scenario Simulator</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>Answers: How do price discounts, supplier lead time delays, or festival spikes change demand and risk?</p>", unsafe_allow_html=True)
 
     col_w1, col_w2 = st.columns([1, 1.8])
     with col_w1:
-        sim_store = st.selectbox("Select Store", filt_df["Store"].unique(), key="lab_st")
-        sim_prd = st.selectbox("Select Product", filt_df[filt_df["Store"]==sim_store]["Product"].unique(), key="lab_pr")
+        sim_store = st.selectbox("Select Store", filt_df["Store"].unique() if not filt_df.empty else ["S01"], key="lab_st")
+        sim_prd = st.selectbox("Select Product", filt_df[filt_df["Store"]==sim_store]["Product"].unique() if not filt_df.empty else ["Fresh Milk 1L"], key="lab_pr")
         
         sim_disc = st.slider("Additional Price Discount (%)", 0.0, 50.0, 15.0, step=5.0) / 100.0
         sim_delay = st.slider("Extra Supplier Delay (Days)", 0, 7, 2)
         sim_fest = st.checkbox("Simulate Upcoming Festival Surge", value=True)
         
     with col_w2:
-        base_item = filt_df[(filt_df["Store"]==sim_store) & (filt_df["Product"]==sim_prd)].iloc[0]
+        base_item = filt_df[(filt_df["Store"]==sim_store) & (filt_df["Product"]==sim_prd)].iloc[0] if not filt_df.empty else None
         
         models_dir = ROOT_DIR / "models"
-        if (models_dir / "demand_forecast_model.joblib").exists():
+        if base_item is not None and (models_dir / "demand_forecast_model.joblib").exists():
             reg_p = joblib.load(models_dir / "demand_forecast_model.joblib")
             clf_p = joblib.load(models_dir / "stockout_risk_model.joblib")
             item_row_df = st.session_state.snapshot_df[st.session_state.snapshot_df["store_id"]==sim_store].head(1)
             
-            simulator = WhatIfSimulator(reg_p, clf_p, rec_engine)
+            simulator = WhatIfSimulator(reg_p, clf_p, rec_eng)
             sim_res = simulator.simulate(item_row_df, discount_pct_delta=sim_disc, extra_lead_days=sim_delay, festival_uplift=sim_fest)
             
             st.markdown("#### Real-Time Scenario Simulation Results")
@@ -540,7 +542,7 @@ elif nav_page == "🎛️ What-If Lab":
 
 
 # -------------------- VIEW 7: MODEL PERFORMANCE --------------------
-elif nav_page == "🔬 Model Performance":
+elif st.session_state.nav_page == "🔬 Model Performance":
     st.markdown("<h1 class='page-title'>Model Performance Benchmarks & Validation</h1>", unsafe_allow_html=True)
     st.markdown("<p class='page-subtitle'>Answers: How accurate are our machine learning models and why were they selected?</p>", unsafe_allow_html=True)
 
