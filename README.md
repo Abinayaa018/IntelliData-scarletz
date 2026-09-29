@@ -50,10 +50,35 @@
                                                    v
                                +---------------------------------------+
                                | dashboard/ (Sci-Fi Mission Control)   |
+                               | - Landing Page Cinematic 3D Hero      |
+                               | - Sidebar Stepper & 7 Task Pages      |
                                | - Three.js 3D Store Digital Twin      |
-                               | - 7 Analytics Tabs & Action Queue     |
                                +---------------------------------------+
 ```
+
+---
+
+## 🎨 Guided App Flow & Visual Identity
+
+The STOCKSENSE dashboard follows a single continuous guided journey:
+
+1. **Cinematic 3D Landing Page**:
+   - Full-screen holographic supermarket animation built in Three.js (`r128`).
+   - One-line tagline (*"Predict demand. Prevent stock-outs. Power better decisions."*).
+   - Primary **🚀 ENTER COMMAND CENTRE** button (session state routing).
+2. **Sidebar Control Panel**:
+   - **Guided Stepper**: `1 Load Data -> 2 Run Prediction -> 3 Review Risk -> 4 Take Action`.
+   - **Data Source Selector**: Choice between "Use demo data" and custom `master_table.csv` upload.
+   - **5-Stage Pipeline Execution Button**: Feature Engineering -> Demand Forecast -> Stock-Out Risk -> Explanations -> Recommendations with stage progress bar and timestamping.
+   - **Global Multi-Select Filters**: Store, City, Category, Risk level, Product search, Reorder toggle, and **🔄 Reset All Filters**.
+3. **7 Task Dashboard Pages**:
+   - `🌐 Executive Summary`: Equal-height KPI grid, 540px Three.js 3D Store Twin with warning beacons and 7-day drain replay.
+   - `📈 Demand Intelligence`: Actual vs forecast charts with confidence bands and category trends.
+   - `🛡️ Inventory Risk`: Risk tiles, probability heatmap, and sortable risk matrix.
+   - `🛒 Manager Action Centre`: Prioritized action cards with order approval toggles and lost sales prevented counter.
+   - `🧠 Explainability`: Global permutation importance and local plain-language driver breakdowns.
+   - `🎛️ What-If Lab`: Interactive discount, supplier delay, and festival uplift simulator.
+   - `🔬 Model Performance`: Regression & classification benchmark comparison tables and model justification.
 
 ---
 
@@ -64,8 +89,8 @@
 pip install -r requirements.txt
 ```
 
-### 2. Demo Mode Execution (Synthetic Data Pipeline)
-To generate realistic synthetic data and run the end-to-end training and prediction pipeline:
+### 2. Demo Mode Pipeline
+To generate synthetic master table data and run model training + prediction CLI:
 ```bash
 python -m src.pipeline demo
 ```
@@ -87,7 +112,6 @@ streamlit run dashboard/app.py
      store_id: "Store_Code"
      product_id: "SKU_ID"
      units_sold: "Qty_Sold"
-     # ... update mappings as needed
    ```
 3. Run model training on the real dataset:
    ```bash
@@ -104,29 +128,10 @@ streamlit run dashboard/app.py
 
 STOCKSENSE enforces strict zero data leakage guarantees across all feature groups:
 - **Lags**: `lag_k` at date \(t\) is computed using `.shift(k)` where \(k \ge 1\).
-- **Rolling Features**: All rolling statistics (means, std, min/max) apply `.shift(1)` **BEFORE** `.rolling(window)`. At date \(t\), rolling windows cover \([t-w, t-1]\) and NEVER include date \(t\)'s demand.
+- **Rolling Features**: All rolling statistics apply `.shift(1)` **BEFORE** `.rolling(window)`. At date \(t\), rolling windows cover \([t-w, t-1]\) and NEVER include date \(t\)'s demand.
 - **Preprocessing**: Encoders and scalers are fitted strictly on training dates inside scikit-learn `Pipeline` objects.
 
-Full feature dictionary and leakage proofs: [`reports/feature_dictionary.md`](file:///d:/IntelliData-scarletz/reports/feature_dictionary.md).
-
----
-
-## 🎯 Operational Stock-Out Definition
-
-A stock-out is operationally defined (`stockout_flag = 1`) for a 7-day horizon if:
-1. `closing_stock` reaches 0 or falls below threshold (\(1.0 \times \text{rolling\_mean\_7}\)), OR
-2. Projected 7-day demand (`next_7_day_demand`) exceeds total available stock (`closing_stock + received`).
-
-This definition captures both physical zero-stock events and imminent unfulfilled customer demand.
-
----
-
-## 🔬 Model Selection Summary
-
-- **Demand Forecasting (Regression)**: Winner = **XGBoost / Lasso Regressor** (MAE = 27.5 units, sMAPE = 9.8%, R² = 0.966). Chosen to minimize under-forecast rate and lost sales.
-- **Stock-Out Risk (Classification)**: Winner = **Random Forest (Calibrated via Platt Scaling)** (F1 = 0.993, ROC-AUC = 0.999). Probabilities are calibrated on a validation set so output percentages reflect true likelihood.
-
-Full justification report: [`reports/model_justification.md`](file:///d:/IntelliData-scarletz/reports/model_justification.md).
+Full feature dictionary: [`reports/feature_dictionary.md`](file:///d:/IntelliData-scarletz/reports/feature_dictionary.md).
 
 ---
 
