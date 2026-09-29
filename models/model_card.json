@@ -1,0 +1,42 @@
+{
+  "project": "STOCKSENSE",
+  "training_dates": {
+    "start": "2026-01-01",
+    "end": "2026-05-01",
+    "row_count": 1815
+  },
+  "regression_winner": "XGBoost Regressor",
+  "regression_metrics": {
+    "Model": "Baseline: Prev 7D Mean",
+    "MAE": 26.247,
+    "RMSE": 40.227,
+    "sMAPE (%)": 9.57,
+    "R2": 0.9695,
+    "Bias": 4.558,
+    "Under-Forecast Rate (%)": 42.47
+  },
+  "classification_winner": "Random Forest (Balanced)",
+  "classification_metrics": {
+    "Model": "Random Forest (Balanced)",
+    "Accuracy": 0.9852,
+    "Precision": 0.9913,
+    "Recall": 0.9913,
+    "F1 Score": 0.9913,
+    "ROC-AUC": 0.9966,
+    "PR-AUC": 0.9994,
+    "Confusion Matrix": [
+      [
+        59,
+        3
+      ],
+      [
+        3,
+        340
+      ]
+    ]
+  },
+  "risk_thresholds": {
+    "high": 0.7,
+    "medium": 0.4
+  }
+}

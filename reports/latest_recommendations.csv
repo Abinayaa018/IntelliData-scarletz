@@ -1,0 +1,16 @@
+Store,Product,Current Stock,7-Day Forecast,Stock-out Probability,Risk,Recommended Order,Key Reasons,Manager Action,Estimated Lost Sales
+S01,Fresh Organic Milk 1L,136,240,0.998,HIGH,123,"High stockout probability, Unfulfilled demand (104 units)",Raise replenishment order IMMEDIATELY (+123 units),6233.99
+S01,Artisanal White Bread 400g,108,180,0.995,HIGH,86,"High stockout probability, Unfulfilled demand (72 units)",Raise replenishment order IMMEDIATELY (+86 units),3233.44
+S01,Sparkling Soda 500ml,6,303,0.999,HIGH,326,"High stockout probability, Unfulfilled demand (297 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+326 units),9368.23
+S01,Basmati Premium Rice 5kg,51,71,0.993,HIGH,39,"High stockout probability, Unfulfilled demand (20 units)",Raise replenishment order IMMEDIATELY (+39 units),8301.97
+S01,Herbal Shampoo 250ml,11,72,0.998,HIGH,72,"High stockout probability, Unfulfilled demand (61 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+72 units),10777.28
+S02,Fresh Organic Milk 1L,367,438,0.045,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0
+S02,Artisanal White Bread 400g,0,302,0.999,HIGH,317,"High stockout probability, Unfulfilled demand (302 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+317 units),12236.84
+S02,Sparkling Soda 500ml,377,597,0.996,HIGH,249,"High stockout probability, Unfulfilled demand (220 units)",Raise replenishment order IMMEDIATELY (+249 units),7699.75
+S02,Basmati Premium Rice 5kg,0,139,0.998,HIGH,157,"High stockout probability, Unfulfilled demand (139 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+157 units),62330.62
+S02,Herbal Shampoo 250ml,83,84,0.932,HIGH,11,"High stockout probability, Unfulfilled demand (1 units)",Raise replenishment order IMMEDIATELY (+11 units),241.95
+S03,Fresh Organic Milk 1L,0,587,0.998,HIGH,606,"High stockout probability, Unfulfilled demand (587 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+606 units),35236.73
+S03,Artisanal White Bread 400g,0,508,0.999,HIGH,522,"High stockout probability, Unfulfilled demand (508 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+522 units),22846.34
+S03,Sparkling Soda 500ml,0,825,0.999,HIGH,854,"High stockout probability, Unfulfilled demand (825 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+854 units),28890.47
+S03,Basmati Premium Rice 5kg,0,156,0.999,HIGH,175,"High stockout probability, Unfulfilled demand (156 units), Stock below reorder level",Raise replenishment order IMMEDIATELY (+175 units),70064.43
+S03,Herbal Shampoo 250ml,180,184,0.023,LOW,0,Stable demand velocity,Monitor stock levels — adequate inventory cover,0.0

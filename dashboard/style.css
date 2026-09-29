@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@400;600;700&family=JetBrains+Mono:wght@400;600&display=swap');
+
+/* Master Sci-Fi Mission Control Styling */
+:root {
+    --bg-dark: #070a14;
+    --card-bg: rgba(15, 23, 42, 0.75);
+    --border-glow: rgba(0, 243, 255, 0.25);
+    --accent-cyan: #00f3ff;
+    --accent-violet: #bf00ff;
+    --risk-high: #ff0055;
+    --risk-med: #ffaa00;
+    --risk-low: #00ff88;
+    --font-heading: 'Orbitron', sans-serif;
+    --font-body: 'Rajdhani', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+}
+
+body, .stApp {
+    background-color: var(--bg-dark) !important;
+    color: #e2e8f0 !important;
+    font-family: var(--font-body) !important;
+}
+
+/* Header & Typography */
+h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading) !important;
+    letter-spacing: 1px;
+    color: #ffffff !important;
+}
+
+h1 {
+    background: linear-gradient(90deg, #00f3ff, #bf00ff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 20px rgba(0, 243, 255, 0.3);
+}
+
+/* Glassmorphism Card Container */
+.glass-card {
+    background: var(--card-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--border-glow);
+    border-radius: 12px;
+    padding: 18px 24px;
+    margin-bottom: 16px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 15px rgba(0, 243, 255, 0.05);
+    transition: all 0.3s ease;
+}
+
+.glass-card:hover {
+    border-color: rgba(0, 243, 255, 0.5);
+    box-shadow: 0 10px 40px 0 rgba(0, 243, 255, 0.15);
+}
+
+/* Demo Data Badge */
+.demo-badge {
+    display: inline-block;
+    background: linear-gradient(135deg, #bf00ff, #ff0055);
+    color: #ffffff;
+    font-family: var(--font-heading);
+    font-size: 0.75rem;
+    font-weight: 800;
+    padding: 4px 12px;
+    border-radius: 20px;
+    letter-spacing: 1.5px;
+    box-shadow: 0 0 12px rgba(191, 0, 255, 0.6);
+    animation: pulse-glow 2s infinite alternate;
+}
+
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 8px rgba(191, 0, 255, 0.5); }
+    100% { box-shadow: 0 0 18px rgba(255, 0, 85, 0.9); }
+}
+
+/* KPI Counter Tile */
+.kpi-tile {
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid rgba(0, 243, 255, 0.2);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.kpi-label {
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.kpi-value {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--accent-cyan);
+    text-shadow: 0 0 10px rgba(0, 243, 255, 0.5);
+    margin: 6px 0;
+}
+
+/* Risk Badges */
+.badge-high {
+    background: rgba(255, 0, 85, 0.2);
+    color: var(--risk-high);
+    border: 1px solid var(--risk-high);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.badge-medium {
+    background: rgba(255, 170, 0, 0.2);
+    color: var(--risk-med);
+    border: 1px solid var(--risk-med);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.badge-low {
+    background: rgba(0, 255, 136, 0.2);
+    color: var(--risk-low);
+    border: 1px solid var(--risk-low);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-family: var(--font-heading);
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* Streamlit Widget Overrides */
+.stSelectbox, .stSlider, .stMultiSelect {
+    background: rgba(15, 23, 42, 0.8) !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stSidebar"] {
+    background-color: #0b0f19 !important;
+    border-right: 1px solid rgba(0, 243, 255, 0.15) !important;
+}

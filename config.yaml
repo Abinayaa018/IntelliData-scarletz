@@ -1,0 +1,63 @@
+project_name: STOCKSENSE
+version: 1.0.0
+data:
+  master_table_path: data/processed/master_table.csv
+  synthetic_table_path: data/processed/master_table_synthetic.csv
+  raw_data_dir: data/raw
+  processed_data_dir: data/processed
+
+column_mapping:
+  date: date
+  store_id: store_id
+  product_id: product_id
+  units_sold: units_sold
+  selling_price: selling_price
+  discount_pct: discount_pct
+  promotion_flag: promotion_flag
+  opening_stock: opening_stock
+  received: received
+  closing_stock: closing_stock
+  reorder_level: reorder_level
+  lead_days: lead_days
+  category: category
+  sub_category: sub_category
+  brand: brand
+  mrp: mrp
+  cost_price: cost_price
+  shelf_life_days: shelf_life_days
+  store_type: store_type
+  city: city
+  floor_area_sqft: floor_area_sqft
+  avg_daily_customers: avg_daily_customers
+  temp_c: temp_c
+  rain_mm: rain_mm
+  holiday: holiday
+  festival: festival
+  weekend: weekend
+  local_event: local_event
+
+features:
+  sparse_history_min_days: 14
+  perishability_shelf_life_days: 7
+  lag_days: [1, 7, 14, 28]
+  rolling_windows: [7, 14, 28]
+  
+targets:
+  forecast_horizon_days: 7
+  stockout_threshold_demand_multiplier: 1.0
+
+models:
+  random_seed: 42
+  time_series_splits: 5
+  train_ratio: 0.70
+  val_ratio: 0.15
+  test_ratio: 0.15
+  risk_thresholds:
+    high: 0.70
+    medium: 0.40
+  service_level_z: 1.645
+
+paths:
+  models_dir: models
+  reports_dir: reports
+  dashboard_dir: dashboard
